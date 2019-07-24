@@ -31,6 +31,14 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+
+task downloadTranslations(type: Exec) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+    commandLine "lokalise.exe", "--token=${properties.getProperty("lokalise.token", "")}", "export", "241316195d3851b4d9fa02.39251279", "--type", "xml", "--unzip_to", "app\\\\src\\\\main\\\\res", "--indentation", "4sp"
+}
+
 sonarqube {
     properties {
         property "sonar.projectKey", "mangelio_Android"
