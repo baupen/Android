@@ -3,7 +3,7 @@ dist: trusty
 
 addons:
   sonarcloud:
-    organization: "mangelio-github"
+    organization: "mangelio"
     token:
       secure: "hRsCn0ZIRxRvhz6StRa2Ki729ZZpQiKyJijZnQwyxXcTkBxXKu2y172SFwwiTjFF16cpBTq65dsDib5CNABUugJu0fvqIDf9AD+Gnp+bPLFsapYaM7sH/YPR4hNGgtwBc1xM7IyMzITrsqT6ezj5ToOuKY6gMUESeRh/PwU8jNlw3Osb2LE4y0ssj2PFcGtS5Zy501tOLhOV1FhtnBMIDAI6X9zcA7fuFLdSza0fENvsqR8dItuRbfbcBdceCcHsMSrgZA+HbFiaIzvjRCmJYI0Kmc1ojyVczCiL1y4RZ68L4tQNwko2PXZ7tBvHSqWGk661HHEq0INK9spA6VNeQEORGG3JClXgQk4FG9/zq4pj9G4sczx0tOw/BcorH8B3KsOdk+Gl04mYZmJCgNKv6iTqT/EO3P8Hw0CyPeQQ3ziLrm3Rtu953UIcpPCNSNs6ip4TyH8PEnK0b3kqr+jL/d69BRUKTm3FNDWJMW5Jjwtet2xspViRlGPduK4QugcOunALPKgtfRumOamTf4eREFWMcQ23+K30gFF3YKuzYrfahQh38T/nBF200xC4YeHw5wp5mBCkrjTHnDksvVbNmMm4RBxCigWj0nJZZCTs/mAG/HmYkKWaVpIkBYL5vYGCRJHyZTzLNVAWHZMXtLKEok0iyxCTBomc4CT/YIsYVnU="
 
