@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="app_name">mangel.io</string>
-    <string name="prompt_email">E-mail</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Effectuare il login</string>
-    <string name="action_sign_in_short">Login</string>
-    <string name="welcome">Benvenuti</string>
-    <string name="invalid_username">Questa E-mail non è stata trovata.</string>
+  <string name="app_name">mangel.io</string>
+  <string name="prompt_email">E-mail</string>
+  <string name="prompt_password">Password</string>
+  <string name="action_sign_in">Effettuare il login</string>
+  <string name="action_sign_in_short">Login</string>
+  <string name="welcome">Benvenuti</string>
+  <string name="invalid_username">Questa E-mail non è stata trovata.</string>
+  <string name="login_failed"></string>
 </resources>
