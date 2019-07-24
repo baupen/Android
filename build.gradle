@@ -15,6 +15,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "org.sonarqube" version "2.7"
+}
+
 allprojects {
     repositories {
         google()
@@ -25,4 +29,10 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mangelio_Android"
+    }
 }
