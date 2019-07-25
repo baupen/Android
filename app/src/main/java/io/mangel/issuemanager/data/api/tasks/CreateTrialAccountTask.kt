@@ -6,16 +6,16 @@ import java.util.*
 
 
 class CreateTrialAccountTask(client: Client) : AbstractApiCallTask<TrialRequest, TrialUser>(client) {
+    override fun callApi(request: TrialRequest, client: Client): Response<TrialUser>? {
+        return client.createTrialAccount(request)
+    }
+
     override fun onExecutionSuccessful(asyncTaskId: UUID, response: TrialUser): TaskFinishedEvent {
         return CreateTrialAccountTaskFinished(asyncTaskId, response)
     }
 
     override fun onExecutionFailed(asyncTaskId: UUID, error: Error?): ApiCallFailed {
         return CreateTrialAccountTaskFailed(asyncTaskId, error)
-    }
-
-    override fun callApi(request: TrialRequest, client: Client): Response<TrialUser>? {
-        return client.createTrialAccount(request)
     }
 }
 

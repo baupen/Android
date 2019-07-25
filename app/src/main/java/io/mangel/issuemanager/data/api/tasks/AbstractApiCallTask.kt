@@ -9,11 +9,8 @@ import java.util.*
 
 
 abstract class AbstractApiCallTask<T : Request, T2>(private val client: Client) : AsyncTask<T, Int, Response<T2>?>() {
-
     companion object {
         const val STATUS_SUCCESS = "success"
-        const val STATUS_FAIL = "fail"
-        const val STATUS_ERROR = "error"
     }
 
     private val asyncTaskId = UUID.randomUUID()
@@ -36,7 +33,7 @@ abstract class AbstractApiCallTask<T : Request, T2>(private val client: Client) 
     override fun onPostExecute(result: Response<T2>?) {
         super.onPostExecute(result)
 
-        if (isRequestFailed(result) || result?.data == null) {
+        if (result == null || result.status != STATUS_SUCCESS || result.data == null) {
             val event = onExecutionFailed(asyncTaskId, Error.tryParseFrom(result?.error))
             EventBus.getDefault().post(event)
         } else {
@@ -44,8 +41,6 @@ abstract class AbstractApiCallTask<T : Request, T2>(private val client: Client) 
             EventBus.getDefault().post(event)
         }
     }
-
-    protected fun isRequestFailed(result: Response<T2>?) = result == null || result.status != STATUS_SUCCESS
 }
 
 abstract class ApiCallFailed(taskId: UUID, val error: Error?) : TaskFinishedEvent(taskId)
