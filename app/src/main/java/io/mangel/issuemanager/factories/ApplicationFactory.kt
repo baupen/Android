@@ -1,19 +1,19 @@
 package io.mangel.issuemanager.factories
 
 import android.content.Context
-import android.content.res.AssetManager
 import io.mangel.issuemanager.repositories.UserRepository
 import io.mangel.issuemanager.services.DomainService
+import io.mangel.issuemanager.services.NotificationService
 import io.mangel.issuemanager.services.RestHttpService
 
-public class RepositoryFactory(context: Context) {
+public class ApplicationFactory(context: Context) {
     companion object {
-        private var defaultInstance: RepositoryFactory? = null
+        private var defaultInstance: ApplicationFactory? = null
 
-        fun getInstance(context: Context): RepositoryFactory {
+        fun getInstance(context: Context): ApplicationFactory {
             synchronized(this) {
                 if (defaultInstance == null) {
-                    defaultInstance = RepositoryFactory(context)
+                    defaultInstance = ApplicationFactory(context)
                 }
 
                 return defaultInstance!!
@@ -21,7 +21,8 @@ public class RepositoryFactory(context: Context) {
         }
     }
 
-    private val httpService = RestHttpService()
+    public val notificationService = NotificationService(context)
+    private val httpService = RestHttpService(notificationService)
     private val domainService = DomainService(httpService)
 
     val userRepository = UserRepository(httpService, domainService)

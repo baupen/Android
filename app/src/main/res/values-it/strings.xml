@@ -6,4 +6,12 @@
     <string name="action_sign_in">Effettuare il login</string>
     <string name="invalid_email">Bitte geben Sie Ihre E-Mail ein.</string>
     <string name="password_too_short">Passwort zu kurz.</string>
+    <string name="unknown_email">Diese E-Mail wurde nicht gefunden.</string>
+    <string name="outdated_application">Der Login ist mit dieser Version der Anwendung leider nicht mehr möglich. Bitte
+        lade das Update vom Store herunter.
+    </string>
+    <string name="generic_api_error">Die App kann nicht mit dem Server kommunizieren. Versuche es später noch einmal,
+        und stelle sicher, dass die neueste Version der Anwendung installiert ist.
+    </string>
+    <string name="no_internet_access">Keine Internetverbindung.</string>
 </resources>

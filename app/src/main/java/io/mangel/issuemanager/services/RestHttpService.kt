@@ -8,8 +8,9 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.IOException
+import java.net.UnknownHostException
 
-class RestHttpService {
+class RestHttpService(private val notificationService: NotificationService) {
     companion object {
         private val MEDIA_TYPE_JSON = ("application/json; charset=utf-8").toMediaType()
         private val MEDIA_TYPE_IMAGE = ("image/json; charset=utf-8").toMediaType()
@@ -25,7 +26,6 @@ class RestHttpService {
         return execute(request)
     }
 
-    @Throws(IOException::class)
     fun postJson(url: String, json: String): String? {
         val body = json.toRequestBody(MEDIA_TYPE_JSON)
         val request = getRequestBuilder(url)
@@ -35,7 +35,6 @@ class RestHttpService {
         return execute(request)
     }
 
-    @Throws(IOException::class)
     fun postImage(url: String, filePath: String): String? {
         val file = File(filePath)
         val request = getRequestBuilder(url)
@@ -51,8 +50,16 @@ class RestHttpService {
     }
 
     private fun execute(request: Request): String? {
-        client.newCall(request).execute().use { response ->
-            return response.body?.string()
+        try {
+            client.newCall(request).execute().use { response ->
+                return response.body?.string()
+            }
+        } catch (exception: UnknownHostException) {
+            notificationService.showNotification(Notification.NO_INTERNET_ACCESS)
+            return null
+        } catch (exception: IOException) {
+            notificationService.showNotification(Notification.REQUEST_FAILED)
+            return null
         }
     }
 }
