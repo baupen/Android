@@ -4,8 +4,6 @@
     <string name="prompt_email">E-Mail</string>
     <string name="prompt_password">Passwort</string>
     <string name="action_sign_in">Einloggen</string>
-    <string name="action_sign_in_short">Einloggen</string>
-    <string name="welcome">Willkommen</string>
-    <string name="invalid_username">Benutzer nicht gefunden</string>
-    <string name="login_failed">Login fehlgeschlagen</string>
+    <string name="invalid_email">Bitte geben Sie Ihre E-Mail ein.</string>
+    <string name="password_too_short">Passwort zu kurz.</string>
 </resources>

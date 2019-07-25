@@ -1,20 +1,28 @@
-package io.mangel.issuemanager.data.repositories
+package io.mangel.issuemanager.repositories
 
 import android.util.Base64
-import io.mangel.issuemanager.data.api.Client
-import io.mangel.issuemanager.data.api.LoginRequest
-import io.mangel.issuemanager.data.api.CreateTrialAccountRequest
-import io.mangel.issuemanager.data.api.tasks.CreateTrialAccountTask
-import io.mangel.issuemanager.data.api.tasks.LoginTask
+import io.mangel.issuemanager.api.Client
+import io.mangel.issuemanager.api.LoginRequest
+import io.mangel.issuemanager.api.CreateTrialAccountRequest
+import io.mangel.issuemanager.api.tasks.CreateTrialAccountTask
+import io.mangel.issuemanager.api.tasks.LoginTask
+import io.mangel.issuemanager.api.tasks.LoginTaskFinished
+import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.DomainService
 import io.mangel.issuemanager.services.RestHttpService
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 
 class UserRepository(private val httpService: RestHttpService, private val domainService: DomainService) {
     companion object {
         const val TRIAL_ACCOUNT_HOST = DomainService.DOMAIN_OVERRIDES_HOST
+    }
+
+    init {
+        EventBus.getDefault().register(this)
     }
 
     fun login(email: String, password: String) {
@@ -32,9 +40,24 @@ class UserRepository(private val httpService: RestHttpService, private val domai
     fun createTrialAccount(proposedGivenName: String, proposedFamilyName: String) {
         val loginRequest = CreateTrialAccountRequest(proposedGivenName, proposedFamilyName)
 
-        val client = Client(httpService, TRIAL_ACCOUNT_HOST)
+        val client = Client(
+            httpService,
+            TRIAL_ACCOUNT_HOST
+        )
         val trialAccountTask = CreateTrialAccountTask(client)
         trialAccountTask.execute(loginRequest)
+    }
+
+    fun getLoggedInUser(): User {
+        return user
+    }
+
+    private lateinit var user: User
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    private fun onLoginTaskFinished(event: LoginTaskFinished) {
+        user = User(event.user.givenName, event.user.familyName)
     }
 
     private fun getSHA256Hash(text: String): String {

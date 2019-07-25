@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.data.models
+package io.mangel.issuemanager.models
 
 import java.util.*
 

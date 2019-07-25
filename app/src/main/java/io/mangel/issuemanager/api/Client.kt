@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.data.api
+package io.mangel.issuemanager.api
 
 import io.mangel.issuemanager.services.RestHttpService
 import com.squareup.moshi.Moshi

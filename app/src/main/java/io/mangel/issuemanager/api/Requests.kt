@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.data.api
+package io.mangel.issuemanager.api
 
 abstract class Request
 

@@ -1,10 +1,8 @@
-package io.mangel.issuemanager.data.api.tasks
+package io.mangel.issuemanager.api.tasks
 
-import android.os.AsyncTask
-import io.mangel.issuemanager.data.api.*
-import io.mangel.issuemanager.data.events.TaskFinishedEvent
-import io.mangel.issuemanager.data.events.TaskStartedEvent
-import org.greenrobot.eventbus.EventBus
+import io.mangel.issuemanager.api.Client
+import io.mangel.issuemanager.api.DomainOverride
+import io.mangel.issuemanager.events.TaskFinishedEvent
 import java.util.*
 
 

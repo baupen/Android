@@ -1,9 +1,9 @@
 package io.mangel.issuemanager.services
 
-import io.mangel.issuemanager.data.api.Client
-import io.mangel.issuemanager.data.api.DomainOverride
-import io.mangel.issuemanager.data.api.tasks.DomainOverridesTask
-import io.mangel.issuemanager.data.api.tasks.DomainOverridesTaskFinished
+import io.mangel.issuemanager.api.Client
+import io.mangel.issuemanager.api.DomainOverride
+import io.mangel.issuemanager.api.tasks.DomainOverridesTask
+import io.mangel.issuemanager.api.tasks.DomainOverridesTaskFinished
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -16,7 +16,7 @@ class DomainService(private val httpService: RestHttpService) {
         const val DOMAIN_OVERRIDES_HOST = "https://app.mangel.io"
     }
 
-    private var domainOverrides: List<DomainOverride> = ArrayList()
+    private lateinit var domainOverrides: List<DomainOverride>
 
     init {
         EventBus.getDefault().register(this)
@@ -38,15 +38,15 @@ class DomainService(private val httpService: RestHttpService) {
 
     private var email: String? = null
 
-    public fun initialize(email: String) {
+    fun initialize(email: String) {
         this.email = email;
     }
 
-    public fun getLoginEmail(): String {
+    fun getLoginEmail(): String {
         return getDomainOverriderOrThrow().transformToLoginEmail()
     }
 
-    public fun getHost(): String {
+    fun getHost(): String {
         return getDomainOverriderOrThrow().getHost()
     }
 
@@ -60,7 +60,7 @@ class DomainService(private val httpService: RestHttpService) {
         return DomainOverrider(email, domainOverride)
     }
 
-    class DomainOverrider(private val email: String, private val domainOverride: DomainOverride?) {
+    private class DomainOverrider(private val email: String, private val domainOverride: DomainOverride?) {
         fun transformToLoginEmail(): String {
             if (domainOverride === null) {
                 return email

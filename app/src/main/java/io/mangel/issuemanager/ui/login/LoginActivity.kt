@@ -16,96 +16,67 @@ import android.widget.ProgressBar
 import android.widget.Toast
 
 import io.mangel.issuemanager.R
+import io.mangel.issuemanager.factories.RepositoryFactory
+import kotlinx.android.synthetic.main.activity_login.view.*
+import org.jetbrains.anko.contentView
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var viewHolder: ViewHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
 
-        val username = findViewById<EditText>(R.id.username)
-        val password = findViewById<EditText>(R.id.password)
-        val login = findViewById<Button>(R.id.login)
-        val loading = findViewById<ProgressBar>(R.id.loading)
+        viewHolder = ViewHolder(contentView!!)
 
-        loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
-
-        loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
-            val loginState = it ?: return@Observer
-
-            // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
-
-            if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
-            }
-            if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
-            }
-        })
-
-        loginViewModel.loginResult.observe(this@LoginActivity, Observer {
-            val loginResult = it ?: return@Observer
-
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
-            }
-        })
-
-        username.afterTextChanged {
-            loginViewModel.loginDataChanged(
-                username.text.toString(),
-                password.text.toString()
-            )
+        viewHolder.usernameExitText.afterTextChanged {
+            checkCanSubmit()
         }
 
-        password.apply {
+        viewHolder.passwordEditText.apply {
             afterTextChanged {
-                loginViewModel.loginDataChanged(
-                    username.text.toString(),
-                    password.text.toString()
-                )
+                checkCanSubmit()
             }
 
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
-                            username.text.toString(),
-                            password.text.toString()
-                        )
+                        login()
                 }
                 false
             }
         }
 
-        login.setOnClickListener {
-            loading.visibility = View.VISIBLE
-            loginViewModel.login(username.text.toString(), password.text.toString())
+        viewHolder.loginButton.setOnClickListener {
+            viewHolder.loadingProgressBar.visibility = View.VISIBLE
+            login()
         }
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        // TODO : initiate successful logged in experience
-        Toast.makeText(
-            applicationContext,
-            "$welcome $displayName",
-            Toast.LENGTH_LONG
-        ).show()
+    private fun checkCanSubmit() {
+        val usernameValid = viewHolder.usernameExitText.text.isNotBlank()
+        val passwordValid = viewHolder.passwordEditText.text.isNotBlank()
+        viewHolder.loginButton.isEnabled = usernameValid && passwordValid;
+
+        if (!usernameValid) {
+            viewHolder.usernameExitText.error = getString(R.string.invalid_email)
+        } else if (!passwordValid) {
+            viewHolder.usernameExitText.error = getString(R.string.password_too_short)
+        }
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+    private fun login() {
+        val repository = RepositoryFactory.getInstance(this).userRepository
+        repository.login(viewHolder.usernameExitText.text.toString(), viewHolder.passwordEditText.text.toString())
+    }
+
+    class ViewHolder(view: View) {
+        val usernameExitText: EditText = view.username
+        val passwordEditText: EditText = view.password
+        val loginButton: Button = view.login
+        val loadingProgressBar: ProgressBar = view.loading
     }
 }
 

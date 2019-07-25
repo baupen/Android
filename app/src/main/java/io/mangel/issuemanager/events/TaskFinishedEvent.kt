@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.data.events
+package io.mangel.issuemanager.events
 
 import java.util.*
 

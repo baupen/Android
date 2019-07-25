@@ -1,7 +1,7 @@
-package io.mangel.issuemanager.data.api.tasks
+package io.mangel.issuemanager.api.tasks
 
-import io.mangel.issuemanager.data.api.*
-import io.mangel.issuemanager.data.events.TaskFinishedEvent
+import io.mangel.issuemanager.api.*
+import io.mangel.issuemanager.events.TaskFinishedEvent
 import java.util.*
 
 
