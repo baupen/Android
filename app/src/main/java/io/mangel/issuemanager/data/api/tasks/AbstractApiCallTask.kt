@@ -8,39 +8,27 @@ import org.greenrobot.eventbus.EventBus
 import java.util.*
 
 
-abstract class AbstractApiCallTask<T : Request, T2>(private val client: Client) : AsyncTask<T, Int, Response<T2>?>() {
-    companion object {
-        const val STATUS_SUCCESS = "success"
-    }
+abstract class AbstractApiCallTask<T1, T2>(private val client: Client) : AsyncTask<T1, Int, T2>() {
 
-    private val asyncTaskId = UUID.randomUUID()
+    protected abstract fun callApi(request: T1, client: Client): T2
 
-    protected abstract fun callApi(request: T, client: Client): Response<T2>?
+    protected abstract fun onExecutionFinished(asyncTaskId: UUID, result: T2): TaskFinishedEvent
 
-    protected abstract fun onExecutionFailed(asyncTaskId: UUID, error: Error?): ApiCallFailed
-
-    protected abstract fun onExecutionSuccessful(asyncTaskId: UUID, response: T2): TaskFinishedEvent
-
-    override fun doInBackground(vararg requests: T): Response<T2>? {
+    override fun doInBackground(vararg requests: T1): T2 {
         return callApi(requests.first(), client)
     }
+
+    private val asyncTaskId: UUID = UUID.randomUUID()
 
     override fun onPreExecute() {
         super.onPreExecute()
         EventBus.getDefault().post(TaskStartedEvent(asyncTaskId))
     }
 
-    override fun onPostExecute(result: Response<T2>?) {
+    override fun onPostExecute(result: T2) {
         super.onPostExecute(result)
 
-        if (result == null || result.status != STATUS_SUCCESS || result.data == null) {
-            val event = onExecutionFailed(asyncTaskId, Error.tryParseFrom(result?.error))
-            EventBus.getDefault().post(event)
-        } else {
-            val event = onExecutionSuccessful(asyncTaskId, result.data)
-            EventBus.getDefault().post(event)
-        }
+        val event = onExecutionFinished(asyncTaskId, result)
+        EventBus.getDefault().post(event)
     }
 }
-
-abstract class ApiCallFailed(taskId: UUID, val error: Error?) : TaskFinishedEvent(taskId)

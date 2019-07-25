@@ -41,3 +41,6 @@ data class Issue(val meta: ObjectMeta, val number: Int?, val isMarked: Boolean, 
 data class Position(val point: Point, val zoomScale: Double, val mapFileID: String)
 data class Status(val registration: Event?, val response: Event?, val review: Event?)
 data class Event(val time: String, val author: String)
+
+data class DomainOverrideRoot(val domainOverrides: List<DomainOverride>)
+data class DomainOverride(val userInputDomain: String, val serverURL: String, val userLoginDomain: String)
