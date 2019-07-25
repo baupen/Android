@@ -15,4 +15,5 @@
         und stelle sicher, dass die neueste Version der Anwendung installiert ist.
     </string>
     <string name="no_internet_access">Keine Internetverbindung.</string>
+    <string name="welcome">Willkommen, %s!</string>
 </resources>

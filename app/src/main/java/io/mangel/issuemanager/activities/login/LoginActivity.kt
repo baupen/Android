@@ -13,8 +13,7 @@ import org.jetbrains.anko.contentView
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.startActivity
 
-class LoginActivity : AbstractActivity(),
-    LoginViewModel.Login {
+class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -22,6 +21,9 @@ class LoginActivity : AbstractActivity(),
 
         val loginViewModel = LoginViewModel(this, contentView!!)
         setLoadingViewModel(loginViewModel)
+
+        // start the factory to init domain overrides & potentially sign in the user
+        applicationFactory
     }
 
     @Suppress("unused")

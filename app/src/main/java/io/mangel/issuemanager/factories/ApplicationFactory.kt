@@ -21,7 +21,7 @@ public class ApplicationFactory(context: Context) {
         }
     }
 
-    public val notificationService = NotificationService(context)
+    val notificationService = NotificationService(context)
     private val httpService = RestHttpService(notificationService)
     private val domainService = DomainService(httpService)
 
