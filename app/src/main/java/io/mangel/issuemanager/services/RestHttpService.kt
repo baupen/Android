@@ -3,9 +3,9 @@ package io.mangel.issuemanager.services
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.net.UnknownHostException
@@ -23,10 +23,19 @@ class RestHttpService(private val notificationService: NotificationService) {
             .get()
             .build()
 
-        return execute(request)
+        return executeForString(request)
     }
 
-    fun postJson(url: String, json: String): String? {
+    fun postJsonForString(url: String, json: String): String? {
+        val body = json.toRequestBody(MEDIA_TYPE_JSON)
+        val request = getRequestBuilder(url)
+            .post(body)
+            .build()
+
+        return executeForString(request)
+    }
+
+    fun postJson(url: String, json: String): Response? {
         val body = json.toRequestBody(MEDIA_TYPE_JSON)
         val request = getRequestBuilder(url)
             .post(body)
@@ -35,13 +44,15 @@ class RestHttpService(private val notificationService: NotificationService) {
         return execute(request)
     }
 
-    fun postImage(url: String, filePath: String): String? {
+    fun postJsonAndImage(url: String, filePath: String): String? {
+
+        //continue: https://stackoverflow.com/questions/24279563/uploading-a-large-file-in-multipart-using-okhttp
         val file = File(filePath)
         val request = getRequestBuilder(url)
             .post(file.asRequestBody(MEDIA_TYPE_IMAGE))
             .build()
 
-        return execute(request)
+        return executeForString(request)
     }
 
     private fun getRequestBuilder(url: String): Request.Builder {
@@ -49,10 +60,14 @@ class RestHttpService(private val notificationService: NotificationService) {
             .url(url)
     }
 
-    private fun execute(request: Request): String? {
+    private fun executeForString(request: Request): String? {
+        return execute(request)?.body?.string()
+    }
+
+    private fun execute(request: Request): Response? {
         try {
             client.newCall(request).execute().use { response ->
-                return response.body?.string()
+                return response
             }
         } catch (exception: UnknownHostException) {
             notificationService.showNotification(Notification.NO_INTERNET_ACCESS)
