@@ -30,7 +30,11 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         viewHolder = ViewHolder(contentView!!)
+        RepositoryFactory.getInstance(this).userRepository
 
+        /**
+         * TODO: put form validation in view model
+         */
         viewHolder.usernameExitText.afterTextChanged {
             checkCanSubmit()
         }
@@ -63,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
         if (!usernameValid) {
             viewHolder.usernameExitText.error = getString(R.string.invalid_email)
         } else if (!passwordValid) {
-            viewHolder.usernameExitText.error = getString(R.string.password_too_short)
+            viewHolder.passwordEditText.error = getString(R.string.password_too_short)
         }
     }
 

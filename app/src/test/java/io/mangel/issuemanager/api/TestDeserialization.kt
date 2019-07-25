@@ -2,8 +2,11 @@ package io.mangel.issuemanager.api
 
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import org.junit.Test
+import com.google.common.reflect.TypeParameter
+import com.google.common.reflect.TypeToken
+import com.google.gson.GsonBuilder
+
 
 class TestDeserializationTest {
     @Test
@@ -54,23 +57,36 @@ class TestDeserializationTest {
                 } 
             """;
 
-        val element = responseJsonToT(json, TrialUser::class.java)
+        val element = deserializeResponse(json, CreateTrialAccountResponse::class.java)
 
         assertThat(element.error).isEqualTo(203)
     }
 
-    protected fun <T> jsonToT(json: String, classOfT: Class<T>): T {
+    @Test
+    fun deserializationResponseWithGeneric_worksAsExpected() {
+        val json =
+            """
+                {"version":1,"status":"success","data":{"user":{"authenticationToken":"token","givenName":"given","familyName":"family","meta":{"id":"8DBF40EE-218D-40F9-AD5A-79B40FB4EBD0","lastChangeTime":"2019-07-21T13:19:12+02:00"}}},"message":null,"error":null}
+            """
+
+        val element = deserializeResponse(json, LoginResponse::class.java)
+
+        assertThat(element.data).isNotNull()
+        assertThat(element.data!!.user.familyName).isEqualTo("family")
+    }
+
+    private fun <T> jsonToT(json: String, classOfT: Class<T>): T {
         val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter<T>(classOfT)
 
         return jsonAdapter.fromJson(json)!!
     }
 
-    protected fun <T1> responseJsonToT(json: String, parameterT: Class<T1>): Response<T1> {
-        val moshi = Moshi.Builder().build()
-        val listOfT = Types.newParameterizedType(Response::class.java, parameterT)
-        val jsonAdapter = moshi.adapter<Response<T1>>(listOfT)
+    private fun <T1: Response> deserializeResponse(json: String, parameterT: Class<T1>): ApiResponse<T1> {
+        val gson = GsonBuilder()
+        val collectionType = object: TypeToken<ApiResponse<T1>>(){}
+            .where(object: TypeParameter<T1>(){}, parameterT).type;
 
-        return jsonAdapter.fromJson(json)!!
+        return gson.create().fromJson<ApiResponse<T1>>(json, collectionType)
     }
 }

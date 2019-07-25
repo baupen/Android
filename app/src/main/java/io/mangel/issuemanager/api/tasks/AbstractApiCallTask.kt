@@ -10,12 +10,12 @@ import java.util.*
 
 abstract class AbstractApiCallTask<T1, T2>(private val client: Client) : AsyncTask<T1, Int, T2>() {
 
-    protected abstract fun callApi(request: T1, client: Client): T2
+    protected abstract fun callApi(client: Client, vararg requests: T1): T2
 
     protected abstract fun onExecutionFinished(asyncTaskId: UUID, result: T2): TaskFinishedEvent
 
     override fun doInBackground(vararg requests: T1): T2 {
-        return callApi(requests.first(), client)
+        return callApi(client, *requests)
     }
 
     private val asyncTaskId: UUID = UUID.randomUUID()

@@ -55,7 +55,7 @@ class DomainService(private val httpService: RestHttpService) {
         val email = email
             ?: throw IllegalArgumentException("must initialize the domain service before calling any of its other functions")
 
-        val domainOverride = domainOverrides.firstOrNull { it.userInputDomain == email }
+        val domainOverride = domainOverrides.firstOrNull { it.userInputDomain == email.split("@").last() }
 
         return DomainOverrider(email, domainOverride)
     }

@@ -5,13 +5,13 @@ import io.mangel.issuemanager.events.TaskFinishedEvent
 import java.util.*
 
 
-class LoginTask(client: Client) : AbstractRestApiCallTask<LoginRequest, User>(client) {
-    override fun callRestApi(request: LoginRequest, client: Client): Response<User>? {
+class LoginTask(client: Client) : AbstractRestApiCallTask<LoginRequest, LoginResponse>(client) {
+    override fun callRestApi(request: LoginRequest, client: Client): ApiResponse<LoginResponse>? {
         return client.login(request)
     }
 
-    override fun onExecutionSuccessful(asyncTaskId: UUID, response: User): TaskFinishedEvent {
-        return LoginTaskFinished(asyncTaskId, response)
+    override fun onExecutionSuccessful(asyncTaskId: UUID, response: LoginResponse): TaskFinishedEvent {
+        return LoginTaskFinished(asyncTaskId, response.user)
     }
 
     override fun onExecutionFailed(asyncTaskId: UUID, error: Error?): RestApiCallFailed {

@@ -7,7 +7,7 @@ import java.util.*
 
 
 class DomainOverridesTask(client: Client) : AbstractApiCallTask<Any, List<DomainOverride>>(client) {
-    override fun callApi(request: Any, client: Client): List<DomainOverride> {
+    override fun callApi(client: Client, vararg requests: Any): List<DomainOverride> {
         return client.getDomainOverrides()
     }
 

@@ -13,6 +13,7 @@ import io.mangel.issuemanager.services.RestHttpService
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.math.BigInteger
 import java.security.MessageDigest
 
 
@@ -48,15 +49,15 @@ class UserRepository(private val httpService: RestHttpService, private val domai
         trialAccountTask.execute(loginRequest)
     }
 
+    private lateinit var user: User
+
     fun getLoggedInUser(): User {
         return user
     }
 
-    private lateinit var user: User
-
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    private fun onLoginTaskFinished(event: LoginTaskFinished) {
+    fun onLoginTaskFinished(event: LoginTaskFinished) {
         user = User(event.user.givenName, event.user.familyName)
     }
 
@@ -66,6 +67,6 @@ class UserRepository(private val httpService: RestHttpService, private val domai
         md.update(text.toByteArray())
         val digest = md.digest()
 
-        return Base64.encodeToString(digest, Base64.DEFAULT)
+        return String.format("%064x", BigInteger(1, digest))
     }
 }

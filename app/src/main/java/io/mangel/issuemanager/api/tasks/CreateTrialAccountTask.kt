@@ -5,13 +5,13 @@ import io.mangel.issuemanager.events.TaskFinishedEvent
 import java.util.*
 
 
-class CreateTrialAccountTask(client: Client) : AbstractRestApiCallTask<CreateTrialAccountRequest, TrialUser>(client) {
-    override fun callRestApi(request: CreateTrialAccountRequest, client: Client): Response<TrialUser>? {
+class CreateTrialAccountTask(client: Client) : AbstractRestApiCallTask<CreateTrialAccountRequest, CreateTrialAccountResponse>(client) {
+    override fun callRestApi(request: CreateTrialAccountRequest, client: Client): ApiResponse<CreateTrialAccountResponse>? {
         return client.createTrialAccount(request)
     }
 
-    override fun onExecutionSuccessful(asyncTaskId: UUID, response: TrialUser): TaskFinishedEvent {
-        return CreateTrialAccountTaskFinished(asyncTaskId, response)
+    override fun onExecutionSuccessful(asyncTaskId: UUID, response: CreateTrialAccountResponse): TaskFinishedEvent {
+        return CreateTrialAccountTaskFinished(asyncTaskId, response.trialUser)
     }
 
     override fun onExecutionFailed(asyncTaskId: UUID, error: Error?): RestApiCallFailed {
