@@ -1,6 +1,6 @@
 package io.mangel.issuemanager.data.api
 
-import java.util.*
+import kotlin.collections.Map
 
 data class Response<T>(val version: Int, val status: String, val data: T?, val error: Int?, val message: String?)
 
@@ -13,7 +13,17 @@ enum class Error(val value: Int) {
     IssueAlreadyExists(200),
     IssueNotFound(201),
     OutdatedData(202), // the server ignored the issue change attempt because the client's data is outdated
-    InvalidAction(203)  // whatever the client is trying to do is impossible, e.g. reviewing a closed issue
+    InvalidAction(203);  // whatever the client is trying to do is impossible, e.g. reviewing a closed issue
+
+    companion object {
+        private val lookupByValue: Map<Int, Error> = values().associateBy { it.value }
+        fun tryParseFrom(i: Int?): Error?  {
+            if (i == null) {
+                return null
+            }
+            return lookupByValue[i]
+        }
+    }
 }
 
 

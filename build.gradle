@@ -2,6 +2,7 @@
 
 buildscript {
     ext.kotlin_version = '1.3.41'
+    ext.anko_version = '0.10.8'
     repositories {
         google()
         jcenter()
@@ -31,12 +32,16 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-
 task downloadTranslations(type: Exec) {
     Properties properties = new Properties()
-    properties.load(project.rootProject.file("local.properties").newDataInputStream())
-
-    commandLine "lokalise.exe", "--token=${properties.getProperty("lokalise.token", "")}", "export", "241316195d3851b4d9fa02.39251279", "--type", "xml", "--unzip_to", "app\\\\src\\\\main\\\\res", "--indentation", "4sp"
+    File file = project.rootProject.file("local.properties")
+    if (file.exists()) {
+        properties.load(file.newDataInputStream())
+        commandLine "lokalise.exe", "--token=${properties.getProperty("lokalise.token", "")}", "export", "241316195d3851b4d9fa02.39251279", "--type", "xml", "--unzip_to", "app\\\\src\\\\main\\\\res", "--indentation", "4sp"
+    } else {
+        commandLine "cmd" // dummy task to avoid failing build
+        println "skipping translation download as no local properties found"
+    }
 }
 
 sonarqube {

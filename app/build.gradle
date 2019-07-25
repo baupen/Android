@@ -34,9 +34,13 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation "com.squareup.moshi:moshi:1.8.0"
-    testImplementation "com.google.truth:truth:1.0"
+    implementation "com.squareup.moshi:moshi:1.8.0" // json deserialize
+    implementation "org.jetbrains.anko:anko-commons:$anko_version" // easy notifications
+    implementation "org.jetbrains.anko:anko-sqlite:$anko_version" // sqlite wrapper
+    implementation "com.squareup.okhttp3:okhttp:4.0.1" // REST http library
+    implementation 'org.greenrobot:eventbus:3.1.1' // send & receive events
     testImplementation 'junit:junit:4.12'
+    testImplementation "com.google.truth:truth:1.0" // assertion library
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

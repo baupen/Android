@@ -3,7 +3,10 @@ package io.mangel.issuemanager.api
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import io.mangel.issuemanager.data.api.entities.*
+import io.mangel.issuemanager.data.api.File
+import io.mangel.issuemanager.data.api.Response
+import io.mangel.issuemanager.data.api.TrialUser
+import io.mangel.issuemanager.data.api.User
 import org.junit.Test
 
 class TestDeserializationTest {

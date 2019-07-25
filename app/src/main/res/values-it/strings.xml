@@ -7,4 +7,5 @@
     <string name="action_sign_in_short">Login</string>
     <string name="welcome">Benvenuti</string>
     <string name="invalid_username">Questa E-mail non è stata trovata.</string>
+    <string name="login_failed"></string>
 </resources>
