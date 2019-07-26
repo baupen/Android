@@ -8,10 +8,6 @@ import java.util.*
 abstract class AbstractRestApiCallTask<T : Request, T2: Response>(client: Client) :
     AbstractApiCallTask<T, ApiResponse<T2>?>(client) {
 
-    companion object {
-        const val STATUS_SUCCESS = "success"
-    }
-
     protected abstract fun callRestApi(request: T, client: Client): ApiResponse<T2>?
 
     protected abstract fun onExecutionFailed(asyncTaskId: UUID, error: Error?): RestApiCallFailed
@@ -23,8 +19,8 @@ abstract class AbstractRestApiCallTask<T : Request, T2: Response>(client: Client
     }
 
     override fun onExecutionFinished(asyncTaskId: UUID, result: ApiResponse<T2>?): TaskFinishedEvent {
-        if (result == null || result.status != STATUS_SUCCESS || result.data == null) {
-            return onExecutionFailed(asyncTaskId, Error.tryParseFrom(result?.error))
+        if (result == null || result.isSuccessful || result.data == null) {
+            return onExecutionFailed(asyncTaskId, result?.error)
         } else {
             return onExecutionSuccessful(asyncTaskId, result.data)
         }

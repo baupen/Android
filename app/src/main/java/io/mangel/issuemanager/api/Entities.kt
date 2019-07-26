@@ -2,7 +2,7 @@ package io.mangel.issuemanager.api
 
 import kotlin.collections.Map
 
-data class ApiResponse<T>(val version: Int, val status: String, val data: T?, val error: Int?, val message: String?)
+data class Root<T>(val version: Int, val status: String, val data: T?, val error: Int?, val message: String?)
 
 enum class Error(val value: Int) {
     InvalidRequest(1), // something in the request was malformed, e.g. missing value in json or missing image in multipart
