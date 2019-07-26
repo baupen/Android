@@ -5,20 +5,24 @@ import io.mangel.issuemanager.events.TaskFinishedEvent
 import java.util.*
 
 
-class CreateTrialAccountTask(client: Client) : AbstractRestApiCallTask<CreateTrialAccountRequest, CreateTrialAccountResponse>(client) {
-    override fun callRestApi(request: CreateTrialAccountRequest, client: Client): ApiResponse<CreateTrialAccountResponse>? {
+class CreateTrialAccountTask(client: Client) :
+    AbstractRestApiCallTask<CreateTrialAccountRequest, CreateTrialAccountResponse>(client) {
+    override fun callRestApi(
+        request: CreateTrialAccountRequest,
+        client: Client
+    ): ApiResponse<CreateTrialAccountResponse>? {
         return client.createTrialAccount(request)
     }
 
-    override fun onExecutionSuccessful(asyncTaskId: UUID, response: CreateTrialAccountResponse): TaskFinishedEvent {
-        return CreateTrialAccountTaskFinished(asyncTaskId, response.trialUser)
+    override fun onExecutionSuccessful(response: CreateTrialAccountResponse): RestApiCallSucceeded {
+        return CreateTrialAccountTaskFinished(response.trialUser)
     }
 
-    override fun onExecutionFailed(asyncTaskId: UUID, error: Error?): RestApiCallFailed {
-        return CreateTrialAccountTaskFailed(asyncTaskId, error)
+    override fun onExecutionFailed(error: Error?): RestApiCallFailed {
+        return CreateTrialAccountTaskFailed(error)
     }
 }
 
-class CreateTrialAccountTaskFinished(taskId: UUID, val trialUser: TrialUser) : TaskFinishedEvent(taskId)
+class CreateTrialAccountTaskFinished(val trialUser: TrialUser) : RestApiCallSucceeded()
 
-class CreateTrialAccountTaskFailed(taskId: UUID, error: Error?) : RestApiCallFailed(taskId, error)
+class CreateTrialAccountTaskFailed(error: Error?) : RestApiCallFailed(error)

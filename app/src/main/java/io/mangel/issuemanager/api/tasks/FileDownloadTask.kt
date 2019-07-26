@@ -51,6 +51,6 @@ class FileDownloadTask(private val client: Client) : AsyncTask<FileDownloadTaskE
 
 class FileDownloadTaskEntry(val fileDownloadRequest: FileDownloadRequest, val filePath: String)
 
-class FileDownloadFinished(val fileName: String)
+class FileDownloadFinished(val fileName: String): RestApiCallSucceeded()
 
-class FileDownloadFailed(val fileName: String, error: Error?)
+class FileDownloadFailed(val fileName: String, error: Error?): RestApiCallFailed(error)

@@ -12,7 +12,7 @@ abstract class AbstractApiCallTask<T1, T2>(private val client: Client) : AsyncTa
 
     protected abstract fun callApi(client: Client, vararg requests: T1): T2
 
-    protected abstract fun onExecutionFinished(asyncTaskId: UUID, result: T2): TaskFinishedEvent
+    protected abstract fun onExecutionFinished(result: T2): Any
 
     override fun doInBackground(vararg requests: T1): T2 {
         return callApi(client, *requests)
@@ -28,7 +28,9 @@ abstract class AbstractApiCallTask<T1, T2>(private val client: Client) : AsyncTa
     override fun onPostExecute(result: T2) {
         super.onPostExecute(result)
 
-        val event = onExecutionFinished(asyncTaskId, result)
+        val event = onExecutionFinished(result)
         EventBus.getDefault().post(event)
+
+        EventBus.getDefault().post(TaskFinishedEvent(asyncTaskId))
     }
 }

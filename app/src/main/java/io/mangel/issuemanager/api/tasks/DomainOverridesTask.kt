@@ -11,9 +11,9 @@ class DomainOverridesTask(client: Client) : AbstractApiCallTask<Any, List<Domain
         return client.getDomainOverrides()
     }
 
-    override fun onExecutionFinished(asyncTaskId: UUID, result: List<DomainOverride>): TaskFinishedEvent {
-        return DomainOverridesTaskFinished(asyncTaskId, result)
+    override fun onExecutionFinished(result: List<DomainOverride>): RestApiCallSucceeded {
+        return DomainOverridesTaskFinished(result)
     }
 }
 
-class DomainOverridesTaskFinished(taskId: UUID, val domainOverrides: List<DomainOverride>) : TaskFinishedEvent(taskId)
+class DomainOverridesTaskFinished(val domainOverrides: List<DomainOverride>) : RestApiCallSucceeded()
