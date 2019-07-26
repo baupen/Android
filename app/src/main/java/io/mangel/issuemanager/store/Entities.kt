@@ -1,12 +1,14 @@
 package io.mangel.issuemanager.store
 
-import io.mangel.issuemanager.services.SqliteService
+abstract class SqliteEntry<T>(id: String, lastChangeTime: String) {
+    abstract fun getMeta() : Meta<T>
+}
 
+class User(val id: String, val lastChangeTime: String, val givenName: String, val familyName: String) : SqliteEntry<User>(id, lastChangeTime) {
+    override fun getMeta(): Meta<User> {
+        return UserMeta()
+    }
 
-abstract class Meta(id: String, lastChangeTime: String)
-
-class User(val id: String, val lastChangeTime: String, val givenName: String, val familyName: String) :
-    Meta(id, lastChangeTime) {
 }
 
 data class AuthenticationToken(val host: String, val authenticationToken: String, val userID: String)

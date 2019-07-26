@@ -25,7 +25,7 @@ class DomainOverridesRepository(private val httpService: RestHttpService, privat
     fun loadDomainOverrides() {
         val client = Client(DOMAIN_OVERRIDES_HOST, httpService, serializationService)
         val domainOverridesTask = DomainOverridesTask(client)
-        domainOverridesTask.execute()
+        domainOverridesTask.execute("once")
     }
 
     @Suppress("unused")

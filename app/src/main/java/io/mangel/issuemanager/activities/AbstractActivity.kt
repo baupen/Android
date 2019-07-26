@@ -45,5 +45,5 @@ abstract class AbstractActivity : AppCompatActivity() {
         EventBus.getDefault().unregister(this)
     }
 
-    protected val applicationFactory = ApplicationFactory.getInstance(this)
+    protected fun getApplicationFactory() = ApplicationFactory.getInstance(this)
 }

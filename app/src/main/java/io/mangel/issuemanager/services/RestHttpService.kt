@@ -66,32 +66,34 @@ class RestHttpService(private val notificationService: NotificationService) {
     private fun getStringResponse(request: Request): StringResponse? {
         val response = execute(request) ?: return null;
 
-        return StringResponse(response.isSuccessful, response.body?.string())
+        response.use {
+            return StringResponse(response.isSuccessful, response.body?.string())
+        }
     }
 
     private fun getFileResponse(request: Request, filePath: String): FileResponse? {
         val response = execute(request) ?: return null;
 
-        var errorBody: String? = null
-        val successful = response.isSuccessful
-        val body = response.body
-        if (body != null) {
-            if (successful) {
-                val file = File(filePath)
-                file.writeBytes(body.bytes())
-            } else {
-                errorBody = body.string()
+        response.use {
+            var errorBody: String? = null
+            val successful = response.isSuccessful
+            val body = response.body
+            if (body != null) {
+                if (successful) {
+                    val file = File(filePath)
+                    file.writeBytes(body.bytes())
+                } else {
+                    errorBody = body.string()
+                }
             }
-        }
 
-        return FileResponse(successful, errorBody)
+            return FileResponse(successful, errorBody)
+        }
     }
 
     private fun execute(request: Request): okhttp3.Response? {
         try {
-            client.newCall(request).execute().use { response ->
-                return response
-            }
+            return client.newCall(request).execute()
         } catch (exception: UnknownHostException) {
             notificationService.showNotification(Notification.NO_INTERNET_ACCESS)
             return null

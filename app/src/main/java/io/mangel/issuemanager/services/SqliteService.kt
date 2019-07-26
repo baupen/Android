@@ -2,57 +2,71 @@ package io.mangel.issuemanager.services
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import io.mangel.issuemanager.store.Meta
 import io.mangel.issuemanager.store.User
+import io.mangel.issuemanager.store.UserMeta
 import org.jetbrains.anko.db.*
 
 class SqliteService(context: Context) {
     private val db: IssueManagerDatabaseContext = IssueManagerDatabaseContext(context)
 
     fun store(element: User) {
+        val meta = db.getMeta(element.javaClass)
+
+        val tableName = meta.getTableName()
+        val fieldList = meta.getFieldList().joinToString(separator = ",")
+        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { _ -> "?" }
+
         db.use {
-            insert(
-                Tables.TABLE_NAME_USER,
-                User::id.name to element.id,
-                User::lastChangeTime.name to element.lastChangeTime,
-                User::givenName.name to element.givenName,
-                User::familyName.name to element.familyName
-            )
+            execSQL("INSERT OR REPLACE INTO $tableName($fieldList) VALUES ($valuesPlaceholders)", meta.toArray(element))
         }
     }
 
-    fun getUser(id: String) {
+    fun <T: Any> getById(id: String, classOfT: Class<T>): T? {
+        val meta = db.getMeta(classOfT)
         return db.use {
-            val rowParser = classParser<User>()
-            select(Tables.TABLE_NAME_USER)
+            select(meta.getTableName())
                 .whereArgs("id={id}", "id" to id)
                 .exec {
-                    parseSingle(rowParser)
+                    when (count) {
+                        1 -> return@exec parseSingle(meta.getRowParser())
+                        else -> return@exec null
+                    }
                 }
         }
     }
-}
 
-class Tables {
-    companion object {
-        const val TABLE_NAME_USER = "Users"
+    private fun <T: Any> getByRelation(id: String, relationName: String, classOfT: Class<T>): List<T> {
+        val meta = db.getMeta(classOfT)
+        return db.use {
+            select(meta.getTableName())
+                .whereArgs("$relationName={id}", "id" to id)
+                .exec {
+                    return@exec parseList(meta.getRowParser())
+                }
+        }
     }
+
 }
 
 class IssueManagerDatabaseContext(context: Context) : ManagedSQLiteOpenHelper(context, "Issues", null, 1) {
 
+    private val metas = hashMapOf(
+        User::class.java.name to UserMeta()
+    )
+
     override fun onCreate(db: SQLiteDatabase) {
-        // user table
-        db.createTable(
-            Tables.TABLE_NAME_USER,
-            true,
-            User::id.name to TEXT + PRIMARY_KEY + UNIQUE,
-            User::lastChangeTime.name to TEXT,
-            User::givenName.name to TEXT,
-            User::familyName.name to TEXT
-        )
+        for ((_, meta) in metas) {
+            db.createTable(meta.getTableName(), true, *meta.getColumns())
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // no upgrade needed yet
+    }
+
+    fun <T : Any> getMeta(classOfT: Class<T>): Meta<T> {
+        @Suppress("UNCHECKED_CAST")
+        return metas[classOfT.name] as Meta<T>
     }
 }

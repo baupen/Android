@@ -4,20 +4,16 @@ import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.LoginRequest
 import io.mangel.issuemanager.api.CreateTrialAccountRequest
 import io.mangel.issuemanager.api.tasks.*
-import io.mangel.issuemanager.events.AuthenticationTokenRefreshed
+import io.mangel.issuemanager.events.AuthenticationSuccessfulEvent
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
-import io.mangel.issuemanager.services.DomainService
-import io.mangel.issuemanager.services.RestHttpService
-import io.mangel.issuemanager.services.SerializationService
-import io.mangel.issuemanager.services.SqliteService
+import io.mangel.issuemanager.services.*
 import io.mangel.issuemanager.store.AuthenticationToken
 import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.math.BigInteger
-import java.security.CryptoPrimitive
 import java.security.MessageDigest
 
 
@@ -28,6 +24,7 @@ class UserRepository(
     private val storeConverter: StoreConverter,
     private val modelConverter: ModelConverter,
     private val sqliteService: SqliteService,
+    private val settingService: SettingService,
     private val serializationService: SerializationService
 ) {
     companion object {
@@ -38,8 +35,13 @@ class UserRepository(
         EventBus.getDefault().register(this)
     }
 
-    fun tryAutomaticLogin() {
-        // read out saved authentication token
+    fun tryAutomaticLogin(): Boolean {
+        val token = settingService.readAuthenticationToken() ?: return false
+
+        val authenticationSuccessfulEvent = AuthenticationSuccessfulEvent(token)
+        EventBus.getDefault().post(authenticationSuccessfulEvent)
+
+        return true
     }
 
     fun login(email: String, password: String) {
@@ -62,9 +64,18 @@ class UserRepository(
         trialAccountTask.execute(loginRequest)
     }
 
-    private lateinit var user: User
+    private var user: User? = null
+    private var authenticationToken: AuthenticationToken? = null
 
-    fun getLoggedInUser(): User {
+    fun getLoggedInUser(): User? {
+        val authenticationToken = authenticationToken
+        if (user == null && authenticationToken != null) {
+            val storeUser =
+                sqliteService.getById(authenticationToken.userID, io.mangel.issuemanager.store.User::class.java)
+                    ?: return null
+            user = modelConverter.convert(storeUser)
+        }
+
         return user
     }
 
@@ -76,9 +87,16 @@ class UserRepository(
 
         user = modelConverter.convert(storeUser)
 
-        val token = storeConverter.getAuthenticationToken(event.host, event.user)
-        val authenticationTokenRefreshedEvent = AuthenticationTokenRefreshed(token)
+        val authenticationToken = storeConverter.getAuthenticationToken(event.host, event.user)
+        val authenticationTokenRefreshedEvent = AuthenticationSuccessfulEvent(authenticationToken)
         EventBus.getDefault().post(authenticationTokenRefreshedEvent)
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onAuthenticationSuccessfulEvent(event: AuthenticationSuccessfulEvent) {
+        this.authenticationToken = event.authenticationToken
+        settingService.saveAuthenticationToken(event.authenticationToken)
     }
 
     private fun getSHA256Hash(text: String): String {

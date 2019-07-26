@@ -18,7 +18,7 @@ abstract class AbstractApiAsyncTask<T, T2>(private val client: Client) :
     }
 
     override fun onExecutionFinished(result: ApiResponse<T2>?) {
-        val apiCallFinished: ApiCallFinished = if (result == null || result.isSuccessful || result.data == null) {
+        val apiCallFinished: ApiCallFinished = if (result == null || !result.isSuccessful || result.data == null) {
             onExecutionFailed(result?.error)
         } else {
             onExecutionSuccessful(result.data)

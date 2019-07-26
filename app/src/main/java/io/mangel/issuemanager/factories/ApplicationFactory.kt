@@ -27,10 +27,21 @@ public class ApplicationFactory(context: Context) {
 
     private val serializationService = SerializationService()
     val notificationService = NotificationService(context)
+    private val sharedPreferences = context.getSharedPreferences("io.mangel.issuemanager", Context.MODE_PRIVATE)
+    private val settingService = SettingService(sharedPreferences, serializationService)
     private val httpService = RestHttpService(notificationService)
     private val domainService = DomainService()
     private val sqliteService = SqliteService(context)
 
     val domainRepository = DomainOverridesRepository(httpService, serializationService)
-    val userRepository = UserRepository(httpService, domainRepository, domainService, storeConverter, modelConverter, sqliteService, serializationService)
+    val userRepository = UserRepository(
+        httpService,
+        domainRepository,
+        domainService,
+        storeConverter,
+        modelConverter,
+        sqliteService,
+        settingService,
+        serializationService
+    )
 }
