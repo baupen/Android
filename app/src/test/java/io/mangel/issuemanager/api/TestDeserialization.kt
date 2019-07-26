@@ -3,9 +3,7 @@ package io.mangel.issuemanager.api
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.Moshi
 import org.junit.Test
-import com.google.common.reflect.TypeParameter
-import com.google.common.reflect.TypeToken
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Types
 
 
 class TestDeserializationTest {
@@ -82,11 +80,12 @@ class TestDeserializationTest {
         return jsonAdapter.fromJson(json)!!
     }
 
-    private fun <T1: Response> deserializeResponse(json: String, parameterT: Class<T1>): ApiResponse<T1> {
-        val gson = GsonBuilder()
-        val collectionType = object: TypeToken<ApiResponse<T1>>(){}
-            .where(object: TypeParameter<T1>(){}, parameterT).type;
+    private fun <T1 : Response> deserializeResponse(json: String, parameterT: Class<T1>): Root<T1> {
 
-        return gson.create().fromJson<ApiResponse<T1>>(json, collectionType)
+        val moshi = Moshi.Builder().build()
+        val listOfT = Types.newParameterizedType(Root::class.java, parameterT)
+        val jsonAdapter = moshi.adapter<Root<T1>>(listOfT)
+
+        return jsonAdapter.fromJson(json)!!
     }
 }
