@@ -1,12 +1,15 @@
 package io.mangel.issuemanager.api
 
 import io.mangel.issuemanager.services.RestHttpService
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.lang.reflect.Type
+import io.mangel.issuemanager.services.SerializationService
 
 
-class Client(private val httpService: RestHttpService, private val host: String) {
+class Client(
+    val host: String,
+    private val httpService: RestHttpService,
+    private val serializationService: SerializationService
+) {
     companion object {
         const val STATUS_SUCCESS = "success"
     }
@@ -132,7 +135,7 @@ class Client(private val httpService: RestHttpService, private val host: String)
 
     private fun <T1 : Response> deserializeRoot(json: String?, parameterT: Class<T1>): ApiResponse<T1>? {
         val rootType = Types.newParameterizedType(Root::class.java, parameterT);
-        val root = deserializeType<Root<T1>>(json, rootType) ?: return ApiResponse(false)
+        val root = serializationService.deserialize<Root<T1>>(json, rootType) ?: return ApiResponse(false)
 
         return ApiResponse(root.status == STATUS_SUCCESS, root.data, Error.tryParseFrom(root.error))
     }
@@ -142,29 +145,11 @@ class Client(private val httpService: RestHttpService, private val host: String)
             return null
         }
 
-        return deserialize(stringResponse.body, classOfT)
-    }
-
-    private fun <T1> deserialize(json: String?, classOfT: Class<T1>): T1? {
-        return deserializeType(json, classOfT)
-    }
-
-    private fun <T1> deserializeType(json: String?, typeOfT: Type): T1? {
-        if (json == null) {
-            return null
-        }
-
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter<T1>(typeOfT)
-
-        return jsonAdapter.fromJson(json)
+        return serializationService.deserialize(stringResponse.body, classOfT)
     }
 
     private fun <T : Request> serialize(request: T): String {
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(request.javaClass)
-
-        return jsonAdapter.toJson(request)
+        return serializationService.serialize(request)
     }
 }
 

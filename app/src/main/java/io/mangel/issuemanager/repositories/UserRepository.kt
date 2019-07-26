@@ -1,39 +1,55 @@
 package io.mangel.issuemanager.repositories
 
-import android.util.Base64
 import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.LoginRequest
 import io.mangel.issuemanager.api.CreateTrialAccountRequest
-import io.mangel.issuemanager.api.tasks.CreateTrialAccountTask
-import io.mangel.issuemanager.api.tasks.LoginTask
-import io.mangel.issuemanager.api.tasks.LoginTaskFinished
+import io.mangel.issuemanager.api.tasks.*
+import io.mangel.issuemanager.events.AuthenticationTokenRefreshed
+import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.DomainService
 import io.mangel.issuemanager.services.RestHttpService
+import io.mangel.issuemanager.services.SerializationService
+import io.mangel.issuemanager.services.SqliteService
+import io.mangel.issuemanager.store.AuthenticationToken
+import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.math.BigInteger
+import java.security.CryptoPrimitive
 import java.security.MessageDigest
 
 
-class UserRepository(private val httpService: RestHttpService, private val domainService: DomainService) {
+class UserRepository(
+    private val httpService: RestHttpService,
+    private val domainServiceRepository: DomainOverridesRepository,
+    private val domainService: DomainService,
+    private val storeConverter: StoreConverter,
+    private val modelConverter: ModelConverter,
+    private val sqliteService: SqliteService,
+    private val serializationService: SerializationService
+) {
     companion object {
-        const val TRIAL_ACCOUNT_HOST = DomainService.DOMAIN_OVERRIDES_HOST
+        const val TRIAL_ACCOUNT_HOST = DomainOverridesRepository.DOMAIN_OVERRIDES_HOST
     }
 
     init {
         EventBus.getDefault().register(this)
     }
 
+    fun tryAutomaticLogin() {
+        // read out saved authentication token
+    }
+
     fun login(email: String, password: String) {
-        domainService.initialize(email)
+        val domainOverrider = domainService.getDomainOverrider(domainServiceRepository.domainOverrides, email)
 
         val passwordHash = getSHA256Hash(password)
-        val username = domainService.getLoginEmail()
+        val username = domainOverrider.getLoginEmail()
         val loginRequest = LoginRequest(username, passwordHash)
 
-        val client = Client(httpService, domainService.getHost())
+        val client = Client(domainOverrider.getHost(), httpService, serializationService)
         val loginTask = LoginTask(client)
         loginTask.execute(loginRequest)
     }
@@ -41,10 +57,7 @@ class UserRepository(private val httpService: RestHttpService, private val domai
     fun createTrialAccount(proposedGivenName: String, proposedFamilyName: String) {
         val loginRequest = CreateTrialAccountRequest(proposedGivenName, proposedFamilyName)
 
-        val client = Client(
-            httpService,
-            TRIAL_ACCOUNT_HOST
-        )
+        val client = Client(TRIAL_ACCOUNT_HOST, httpService, serializationService)
         val trialAccountTask = CreateTrialAccountTask(client)
         trialAccountTask.execute(loginRequest)
     }
@@ -58,7 +71,14 @@ class UserRepository(private val httpService: RestHttpService, private val domai
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onLoginTaskFinished(event: LoginTaskFinished) {
-        user = User(event.user.givenName, event.user.familyName)
+        val storeUser = storeConverter.convert(event.user)
+        sqliteService.store(storeUser)
+
+        user = modelConverter.convert(storeUser)
+
+        val token = storeConverter.getAuthenticationToken(event.host, event.user)
+        val authenticationTokenRefreshedEvent = AuthenticationTokenRefreshed(token)
+        EventBus.getDefault().post(authenticationTokenRefreshedEvent)
     }
 
     private fun getSHA256Hash(text: String): String {

@@ -13,7 +13,7 @@ class DomainOverridesTask(private val client: Client) : AbstractApiAsyncTask<Any
     }
 
     override fun onExecutionSuccessful(response: DomainOverrideRoot): ApiCallSucceeded {
-        return DomainOverridesTaskFinished(response.domainOverrides)
+        return DomainOverridesTaskFinished(response)
     }
 
     override fun onExecutionFailed(error: Error?): ApiCallFailed {
@@ -21,5 +21,5 @@ class DomainOverridesTask(private val client: Client) : AbstractApiAsyncTask<Any
     }
 }
 
-class DomainOverridesTaskFinished(val domainOverrides: List<DomainOverride>) : ApiCallSucceeded()
+class DomainOverridesTaskFinished(val domainOverrideRoot: DomainOverrideRoot) : ApiCallSucceeded()
 class DomainOverridesTaskFailed(error: Error?) : ApiCallFailed(error)
