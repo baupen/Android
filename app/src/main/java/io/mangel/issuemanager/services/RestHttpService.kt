@@ -1,58 +1,63 @@
 package io.mangel.issuemanager.services
 
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.net.UnknownHostException
+import javax.swing.text.html.HTML.Tag.FORM
+
+
 
 class RestHttpService(private val notificationService: NotificationService) {
     companion object {
         private val MEDIA_TYPE_JSON = ("application/json; charset=utf-8").toMediaType()
-        private val MEDIA_TYPE_IMAGE = ("image/json; charset=utf-8").toMediaType()
+        private val MEDIA_TYPE_IMAGE = ("image/jpeg").toMediaType()
     }
 
     private var client = OkHttpClient()
 
-    fun get(url: String): String? {
+    fun get(url: String): StringResponse? {
         val request = getRequestBuilder(url)
             .get()
             .build()
 
-        return executeForString(request)
+        return getStringResponse(request)
     }
 
-    fun postJsonForString(url: String, json: String): String? {
+    fun postJsonForString(url: String, json: String): StringResponse? {
         val body = json.toRequestBody(MEDIA_TYPE_JSON)
         val request = getRequestBuilder(url)
             .post(body)
             .build()
 
-        return executeForString(request)
+        return getStringResponse(request)
     }
 
-    fun postJson(url: String, json: String): Response? {
+    fun postJsonForFile(url: String, json: String, filePath: String): FileResponse? {
         val body = json.toRequestBody(MEDIA_TYPE_JSON)
         val request = getRequestBuilder(url)
             .post(body)
             .build()
 
-        return execute(request)
+        return getFileResponse(request, filePath)
     }
 
-    fun postJsonAndImage(url: String, filePath: String): String? {
-
-        //continue: https://stackoverflow.com/questions/24279563/uploading-a-large-file-in-multipart-using-okhttp
+    fun postJsonAndImageForString(url: String, json: String, filePath: String, fileName: String): StringResponse? {
         val file = File(filePath)
-        val request = getRequestBuilder(url)
-            .post(file.asRequestBody(MEDIA_TYPE_IMAGE))
+        val fileRequestBody = file.asRequestBody(MEDIA_TYPE_IMAGE)
+        val requestBody = MultipartBody.Builder()
+            .addFormDataPart("message", json)
+            .addFormDataPart("image", fileName, fileRequestBody)
             .build()
 
-        return executeForString(request)
+        val request = getRequestBuilder(url)
+            .post(requestBody)
+            .build()
+
+        return getStringResponse(request)
     }
 
     private fun getRequestBuilder(url: String): Request.Builder {
@@ -60,11 +65,31 @@ class RestHttpService(private val notificationService: NotificationService) {
             .url(url)
     }
 
-    private fun executeForString(request: Request): String? {
-        return execute(request)?.body?.string()
+    private fun getStringResponse(request: Request): StringResponse? {
+        val response = execute(request) ?: return null;
+
+        return StringResponse(response.isSuccessful, response.body?.string())
     }
 
-    private fun execute(request: Request): Response? {
+    private fun getFileResponse(request: Request, filePath: String): FileResponse? {
+        val response = execute(request) ?: return null;
+
+        var errorBody: String? = null
+        val successful = response.isSuccessful
+        val body = response.body
+        if (body != null) {
+            if (successful) {
+                val file = File(filePath)
+                file.writeBytes(body.bytes())
+            } else {
+                errorBody = body.string()
+            }
+        }
+
+        return FileResponse(successful, errorBody)
+    }
+
+    private fun execute(request: Request): okhttp3.Response? {
         try {
             client.newCall(request).execute().use { response ->
                 return response
@@ -77,4 +102,8 @@ class RestHttpService(private val notificationService: NotificationService) {
             return null
         }
     }
+
+    open class Response(val isSuccessful: Boolean)
+    class FileResponse(successful: Boolean, val errorBody: String? = null) : Response(successful)
+    class StringResponse(successful: Boolean, val body: String?) : Response(successful)
 }

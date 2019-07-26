@@ -9,67 +9,109 @@ class Client(private val httpService: RestHttpService, private val host: String)
     private val baseUrl = "$host/api/external"
 
     fun getDomainOverrides(): List<DomainOverride> {
-        val responseJson = httpService.get("$baseUrl/config/domain_overrides") ?: return ArrayList()
+        val response = httpService.get("$baseUrl/config/domain_overrides")
+        val responseJson = getContentString(response) ?: return ArrayList()
         return deserialize(responseJson, DomainOverrideRoot::class.java).domainOverrides
     }
 
     fun createTrialAccount(trialRequest: CreateTrialAccountRequest): ApiResponse<CreateTrialAccountResponse>? {
         val requestJson = serialize(trialRequest)
-        val responseJson = httpService.postJsonForString("$baseUrl/trial/create_account", requestJson) ?: return null
-        return deserializeResponse(responseJson, CreateTrialAccountResponse::class.java)
+        val response = httpService.postJsonForString("$baseUrl/trial/create_account", requestJson)
+        return deserializeApiResponse(response, CreateTrialAccountResponse::class.java)
     }
 
     fun login(request: LoginRequest): ApiResponse<LoginResponse>? {
         val requestJson = serialize(request)
-        val responseJson = httpService.postJsonForString("$baseUrl/login", requestJson) ?: return null
-        return deserializeResponse(responseJson, LoginResponse::class.java)
+        val response = httpService.postJsonForString("$baseUrl/login", requestJson)
+        return deserializeApiResponse(response, LoginResponse::class.java)
     }
 
     fun read(readRequest: ReadRequest): ApiResponse<ReadResponse>? {
         val requestJson = serialize(readRequest)
-        val responseJson = httpService.postJsonForString("$baseUrl/read", requestJson) ?: return null
-        return deserializeResponse(responseJson, ReadResponse::class.java)
+        val response = httpService.postJsonForString("$baseUrl/read", requestJson)
+        return deserializeApiResponse(response, ReadResponse::class.java)
     }
 
-    fun fileDownload(fileDownloadRequest: FileDownloadRequest): BinaryResponse? {
-        // maybe better to save file in rest http service? then do not need to expose response into the client
-        val requestJson = serialize(fileDownloadRequest)
-        val response = httpService.postJson("$baseUrl/file/download", requestJson) ?: return null
+    private fun getContentString(stringResponse: RestHttpService.StringResponse?): String? {
+        if (stringResponse != null && stringResponse.isSuccessful) {
+            return stringResponse.body
+        }
+        return null
+    }
 
-        val body = response.body
-        if (body != null) {
-            if (response.isSuccessful) {
-                return BinaryResponse(true);
-            } else {
-                val apiResponse = deserializeResponse(body.string(), Object::class.java)
-                return BinaryResponse(false, Error.tryParseFrom(apiResponse.error))
-            }
+    fun fileDownload(fileDownloadRequest: FileDownloadRequest, filePath: String): BinaryResponse? {
+        val requestJson = serialize(fileDownloadRequest)
+        val response = httpService.postJsonForFile("$baseUrl/file/download", requestJson, filePath) ?: return null
+        if (response.isSuccessful) {
+            return BinaryResponse(true);
         } else {
-            return null
+            var error: Error? = null
+            if (response.errorBody != null) {
+                val apiResponse = deserializeApiResponse(response, Object::class.java)
+                error = Error.tryParseFrom(apiResponse?.error)
+            }
+            return BinaryResponse(false, error)
         }
     }
 
-    fun issueCreate(issueRequest: IssueRequest, filePath: String?): ApiResponse<IssueResponse>? {
-        return issueRequest(issueRequest, filePath, "/issue/create")
+    fun issueCreate(issueRequest: IssueRequest, filePath: String?, fileName: String?): ApiResponse<IssueResponse>? {
+        return issueRequest(issueRequest, filePath, fileName, "/issue/create")
     }
 
-    fun issueUpdate(issueRequest: IssueRequest, filePath: String?): ApiResponse<IssueResponse>? {
-        return issueRequest(issueRequest, filePath, "/issue/update")
+    fun issueUpdate(issueRequest: IssueRequest, filePath: String?, fileName: String?): ApiResponse<IssueResponse>? {
+        return issueRequest(issueRequest, filePath, fileName, "/issue/update")
     }
 
-    private fun issueRequest(issueRequest: IssueRequest, filePath: String?, url: String): ApiResponse<IssueResponse>? {
+    private fun issueRequest(
+        issueRequest: IssueRequest,
+        filePath: String?,
+        fileName: String?,
+        url: String
+    ): ApiResponse<IssueResponse>? {
         val requestJson = serialize(issueRequest)
-        // todo: pass file path
-        val responseJson = httpService.postJsonAndImage("$baseUrl$url", requestJson) ?: return null
-        return deserializeResponse(responseJson, IssueResponse::class.java)
+        val requestUrl = "$baseUrl$url"
+
+        val response = if (filePath != null && fileName != null) {
+            httpService.postJsonAndImageForString(requestUrl, requestJson, filePath, fileName) ?: return null
+        } else {
+            httpService.postJsonForString(requestUrl, requestJson) ?: return null
+        }
+        
+        return deserializeApiResponse(response, IssueResponse::class.java)
     }
 
-    private fun <T1> deserializeResponse(json: String, parameterT: Class<T1>): ApiResponse<T1> {
+    private fun <T1> deserializeApiResponse(
+        stringResponse: RestHttpService.StringResponse?,
+        parameterT: Class<T1>
+    ): ApiResponse<T1>? {
+        if (stringResponse == null) {
+            return null
+        }
+
+        return deserializeApiResponse(stringResponse.body, parameterT)
+    }
+
+    private fun <T1> deserializeApiResponse(
+        fileResponse: RestHttpService.FileResponse?,
+        parameterT: Class<T1>
+    ): ApiResponse<T1>? {
+        if (fileResponse == null) {
+            return null
+        }
+
+        return deserializeApiResponse(fileResponse.errorBody, parameterT)
+    }
+
+    private fun <T1> deserializeApiResponse(json: String?, parameterT: Class<T1>): ApiResponse<T1>? {
+        if (json == null) {
+            return null
+        }
+
         val moshi = Moshi.Builder().build()
         val listOfT = Types.newParameterizedType(ApiResponse::class.java, parameterT)
         val jsonAdapter = moshi.adapter<ApiResponse<T1>>(listOfT)
 
-        return jsonAdapter.fromJson(json)!!
+        return jsonAdapter.fromJson(json)
     }
 
     private fun <T1> deserialize(json: String, classOfT: Class<T1>): T1 {
