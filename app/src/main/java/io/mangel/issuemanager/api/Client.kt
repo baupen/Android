@@ -3,6 +3,7 @@ package io.mangel.issuemanager.api
 import io.mangel.issuemanager.services.RestHttpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.lang.reflect.Type
 
 
 class Client(private val httpService: RestHttpService, private val host: String) {
@@ -12,32 +13,32 @@ class Client(private val httpService: RestHttpService, private val host: String)
 
     private val baseUrl = "$host/api/external"
 
-    fun getDomainOverrides(): List<DomainOverride> {
+    fun getDomainOverrides(): ApiResponse<DomainOverrideRoot> {
         val response = httpService.get("$baseUrl/config/domain_overrides")
-        val domainOverrideRoot = deserialize(response, DomainOverrideRoot::class.java) ?: return ArrayList()
+        val domainRoot = deserialize(response, DomainOverrideRoot::class.java)
 
-        return domainOverrideRoot.domainOverrides
+        return ApiResponse(domainRoot != null, domainRoot)
     }
 
     fun createTrialAccount(trialRequest: CreateTrialAccountRequest): ApiResponse<CreateTrialAccountResponse>? {
         val requestJson = serialize(trialRequest)
         val response = httpService.postJsonForString("$baseUrl/trial/create_account", requestJson)
 
-        return deserializeApiResponse(response, CreateTrialAccountResponse::class.java)
+        return deserializeRoot(response, CreateTrialAccountResponse::class.java)
     }
 
     fun login(request: LoginRequest): ApiResponse<LoginResponse>? {
         val requestJson = serialize(request)
         val response = httpService.postJsonForString("$baseUrl/login", requestJson)
 
-        return deserializeApiResponse(response, LoginResponse::class.java)
+        return deserializeRoot(response, LoginResponse::class.java)
     }
 
     fun read(readRequest: ReadRequest): ApiResponse<ReadResponse>? {
         val requestJson = serialize(readRequest)
         val response = httpService.postJsonForString("$baseUrl/read", requestJson)
 
-        return deserializeApiResponse(response, ReadResponse::class.java)
+        return deserializeRoot(response, ReadResponse::class.java)
     }
 
     fun fileDownload(fileDownloadRequest: FileDownloadRequest, filePath: String): ApiResponse<Response>? {
@@ -47,7 +48,7 @@ class Client(private val httpService: RestHttpService, private val host: String)
         return if (response.isSuccessful) {
             ApiResponse(true);
         } else {
-            deserializeApiResponse(response, Response::class.java)
+            deserializeRoot(response, Response::class.java)
         }
     }
 
@@ -90,24 +91,24 @@ class Client(private val httpService: RestHttpService, private val host: String)
             httpService.postJsonForString(requestUrl, requestJson) ?: return null
         }
 
-        return deserializeApiResponse(response, IssueResponse::class.java)
+        return deserializeRoot(response, IssueResponse::class.java)
     }
 
     private fun issueIDRequestWithEmptyResponse(issueIDRequest: IssueIDRequest, url: String): ApiResponse<Response>? {
         val requestJson = serialize(issueIDRequest)
         val response = httpService.postJsonForString("$baseUrl$url", requestJson) ?: return null
 
-        return deserializeApiResponse(response, Response::class.java)
+        return deserializeRoot(response, Response::class.java)
     }
 
     private fun issueIDRequest(issueIDRequest: IssueIDRequest, url: String): ApiResponse<IssueResponse>? {
         val requestJson = serialize(issueIDRequest)
         val response = httpService.postJsonForString("$baseUrl$url", requestJson) ?: return null
 
-        return deserializeApiResponse(response, IssueResponse::class.java)
+        return deserializeRoot(response, IssueResponse::class.java)
     }
 
-    private fun <T1 : Response> deserializeApiResponse(
+    private fun <T1 : Response> deserializeRoot(
         stringResponse: RestHttpService.StringResponse?,
         parameterT: Class<T1>
     ): ApiResponse<T1>? {
@@ -115,10 +116,10 @@ class Client(private val httpService: RestHttpService, private val host: String)
             return null
         }
 
-        return deserializeApiResponse(stringResponse.body, parameterT)
+        return deserializeRoot(stringResponse.body, parameterT)
     }
 
-    private fun <T1 : Response> deserializeApiResponse(
+    private fun <T1 : Response> deserializeRoot(
         fileResponse: RestHttpService.FileResponse?,
         parameterT: Class<T1>
     ): ApiResponse<T1>? {
@@ -126,21 +127,14 @@ class Client(private val httpService: RestHttpService, private val host: String)
             return null
         }
 
-        return deserializeApiResponse(fileResponse.errorBody, parameterT)
+        return deserializeRoot(fileResponse.errorBody, parameterT)
     }
 
-    private fun <T1 : Response> deserializeApiResponse(json: String?, parameterT: Class<T1>): ApiResponse<T1>? {
-        if (json == null) {
-            return null
-        }
+    private fun <T1 : Response> deserializeRoot(json: String?, parameterT: Class<T1>): ApiResponse<T1>? {
+        val rootType = Types.newParameterizedType(Root::class.java, parameterT);
+        val root = deserializeType<Root<T1>>(json, rootType) ?: return ApiResponse(false)
 
-        val moshi = Moshi.Builder().build()
-        val listOfT = Types.newParameterizedType(Root::class.java, parameterT)
-        val jsonAdapter = moshi.adapter<Root<T1>>(listOfT)
-
-        val root = jsonAdapter.fromJson(json) ?: return ApiResponse(false)
-
-        return ApiResponse(root.status == STATUS_SUCCESS, Error.tryParseFrom(root.error), root.data)
+        return ApiResponse(root.status == STATUS_SUCCESS, root.data, Error.tryParseFrom(root.error))
     }
 
     private fun <T1> deserialize(stringResponse: RestHttpService.StringResponse?, classOfT: Class<T1>): T1? {
@@ -152,12 +146,16 @@ class Client(private val httpService: RestHttpService, private val host: String)
     }
 
     private fun <T1> deserialize(json: String?, classOfT: Class<T1>): T1? {
+        return deserializeType(json, classOfT)
+    }
+
+    private fun <T1> deserializeType(json: String?, typeOfT: Type): T1? {
         if (json == null) {
             return null
         }
 
         val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter<T1>(classOfT)
+        val jsonAdapter = moshi.adapter<T1>(typeOfT)
 
         return jsonAdapter.fromJson(json)
     }
@@ -170,4 +168,8 @@ class Client(private val httpService: RestHttpService, private val host: String)
     }
 }
 
-data class ApiResponse<T>(val isSuccessful: Boolean, val error: Error? = null, val data: T? = null)
+data class ApiResponse<T>(
+    val isSuccessful: Boolean,
+    val data: T? = null,
+    val error: Error? = null
+)

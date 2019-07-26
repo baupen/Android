@@ -5,12 +5,12 @@ import io.mangel.issuemanager.api.Map
 import java.util.*
 
 
-class ReadTask(client: Client) : AbstractRestApiCallTask<ReadRequest, ReadResponse>(client) {
-    override fun callRestApi(request: ReadRequest, client: Client): ApiResponse<ReadResponse>? {
+class ReadTask(client: Client) : AbstractApiAsyncTask<ReadRequest, ReadResponse>(client) {
+    override fun callApi(request: ReadRequest, client: Client): ApiResponse<ReadResponse>? {
         return client.read(request)
     }
 
-    override fun onExecutionSuccessful(response: ReadResponse): RestApiCallSucceeded {
+    override fun onExecutionSuccessful(response: ReadResponse): ApiCallSucceeded {
         return ReadTaskFinished(
             response.changedCraftsmen,
             response.removedCraftsmanIDs,
@@ -24,7 +24,7 @@ class ReadTask(client: Client) : AbstractRestApiCallTask<ReadRequest, ReadRespon
         )
     }
 
-    override fun onExecutionFailed(error: Error?): RestApiCallFailed {
+    override fun onExecutionFailed(error: Error?): ApiCallFailed {
         return ReadTaskFailed(error)
     }
 }
@@ -39,6 +39,6 @@ class ReadTaskFinished(
     val changedIssues: List<Issue>,
     val removedIssueIDs: List<UUID>,
     val changedUser: User?
-) : RestApiCallSucceeded()
+) : ApiCallSucceeded()
 
-class ReadTaskFailed(error: Error?) : RestApiCallFailed(error)
+class ReadTaskFailed(error: Error?) : ApiCallFailed(error)
