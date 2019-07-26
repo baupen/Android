@@ -62,6 +62,22 @@ class Client(private val httpService: RestHttpService, private val host: String)
         return issueRequest(issueRequest, filePath, fileName, "/issue/update")
     }
 
+    fun issueDelete(issueIDRequest: IssueIDRequest): ApiResponse<Response>? {
+        return issueIDRequestWithEmptyResponse(issueIDRequest, "/issue/delete")
+    }
+
+    fun issueMark(issueIDRequest: IssueIDRequest): ApiResponse<IssueResponse>? {
+        return issueIDRequest(issueIDRequest, "/issue/mark")
+    }
+
+    fun issueReview(issueIDRequest: IssueIDRequest): ApiResponse<IssueResponse>? {
+        return issueIDRequest(issueIDRequest, "/issue/review")
+    }
+
+    fun issueRevert(issueIDRequest: IssueIDRequest): ApiResponse<IssueResponse>? {
+        return issueIDRequest(issueIDRequest, "/issue/revert")
+    }
+
     private fun issueRequest(
         issueRequest: IssueRequest,
         filePath: String?,
@@ -76,7 +92,21 @@ class Client(private val httpService: RestHttpService, private val host: String)
         } else {
             httpService.postJsonForString(requestUrl, requestJson) ?: return null
         }
-        
+
+        return deserializeApiResponse(response, IssueResponse::class.java)
+    }
+
+    private fun issueIDRequestWithEmptyResponse(issueIDRequest: IssueIDRequest, url: String): ApiResponse<Response>? {
+        val requestJson = serialize(issueIDRequest)
+        val response = httpService.postJsonForString("$baseUrl$url", requestJson) ?: return null
+
+        return deserializeApiResponse(response, Response::class.java)
+    }
+
+    private fun issueIDRequest(issueIDRequest: IssueIDRequest, url: String): ApiResponse<IssueResponse>? {
+        val requestJson = serialize(issueIDRequest)
+        val response = httpService.postJsonForString("$baseUrl$url", requestJson) ?: return null
+
         return deserializeApiResponse(response, IssueResponse::class.java)
     }
 

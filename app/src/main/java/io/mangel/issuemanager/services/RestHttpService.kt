@@ -7,8 +7,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.IOException
 import java.net.UnknownHostException
-import javax.swing.text.html.HTML.Tag.FORM
-
 
 
 class RestHttpService(private val notificationService: NotificationService) {
