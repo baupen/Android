@@ -70,9 +70,7 @@ class UserRepository(
     fun getLoggedInUser(): User? {
         val authenticationToken = authenticationToken
         if (user == null && authenticationToken != null) {
-            val storeUser =
-                sqliteService.getById(authenticationToken.userID, io.mangel.issuemanager.store.User::class.java)
-                    ?: return null
+            val storeUser = settingService.readUser() ?: return null
             user = modelConverter.convert(storeUser)
         }
 
@@ -83,7 +81,7 @@ class UserRepository(
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onLoginTaskFinished(event: LoginTaskFinished) {
         val storeUser = storeConverter.convert(event.user)
-        sqliteService.store(storeUser)
+        settingService.saveUser(storeUser)
 
         user = modelConverter.convert(storeUser)
 

@@ -5,6 +5,7 @@ import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.repositories.DomainOverridesRepository
 import io.mangel.issuemanager.repositories.UserRepository
 import io.mangel.issuemanager.services.*
+import io.mangel.issuemanager.store.MetaProvider
 import io.mangel.issuemanager.store.StoreConverter
 
 public class ApplicationFactory(context: Context) {
@@ -31,7 +32,8 @@ public class ApplicationFactory(context: Context) {
     private val settingService = SettingService(sharedPreferences, serializationService)
     private val httpService = RestHttpService(notificationService)
     private val domainService = DomainService()
-    private val sqliteService = SqliteService(context)
+    private val metaProvider = MetaProvider()
+    private val sqliteService = SqliteService(metaProvider, context)
 
     val domainRepository = DomainOverridesRepository(httpService, serializationService)
     val userRepository = UserRepository(
