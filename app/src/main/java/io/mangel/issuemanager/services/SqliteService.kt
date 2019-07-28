@@ -50,7 +50,8 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
 class IssueManagerDatabaseContext(private val metaProvider: MetaProvider, context: Context) : ManagedSQLiteOpenHelper(context, "Issues", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        for ((_, meta) in metaProvider.metas) {
+        for (table in metaProvider.supported) {
+            val meta = metaProvider.getMeta(table)
             db.createTable(meta.getTableName(), true, *meta.getColumns())
         }
     }

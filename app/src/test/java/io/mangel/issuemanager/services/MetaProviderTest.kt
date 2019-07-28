@@ -3,15 +3,24 @@ package io.mangel.issuemanager.services
 import com.google.common.truth.Truth.assertThat
 import io.mangel.issuemanager.store.MetaProvider
 import io.mangel.issuemanager.store.SqliteEntry
-import org.junit.Ignore
 import org.junit.Test
+import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
+import kotlin.reflect.KClassifier
 import kotlin.reflect.full.primaryConstructor
 
 class MetaProviderTest {
     private val metaProvider = MetaProvider()
 
-    @Ignore("will be implemented in the next commit")
+    @Test
+    fun supported_containsAllSubclasses() {
+        val classes = SqliteEntry::class.sealedSubclasses
+        assertThat(metaProvider.supported).hasLength(classes.size)
+
+        val classSet = HashSet(classes)
+        assertThat(classSet).hasSize(classes.size)
+    }
+
     @Test
     fun subclassesOfSqliteEntry_eachProvidesMeta() {
         val classes = SqliteEntry::class.sealedSubclasses
@@ -24,8 +33,8 @@ class MetaProviderTest {
 
     @Test
     fun tableNames_areUnique() {
-        val allTableNames = metaProvider.metas.map { m -> m.key }
-        val set = allTableNames.toSet()
+        val allTableNames = metaProvider.supported.map { m -> metaProvider.getMeta(m).getTableName() }
+        val set = HashSet(allTableNames)
 
         assertThat(allTableNames).hasSize(set.size)
     }
@@ -33,13 +42,22 @@ class MetaProviderTest {
     private fun <T : Any> assertMetaMakesSense(subject: KClass<T>) {
         val constructor = subject.primaryConstructor!!
 
-        val parameterList = ArrayList<String>()
-        for (index in 0 until constructor.parameters.size) {
-            parameterList.add(index.toString())
+        val parameterList = ArrayList<Any>()
+        val parameterListWithNullable = ArrayList<Any?>()
+        for ((index, parameter) in constructor.parameters.withIndex()) {
+            val value = getValueForType(parameter.type.classifier, index)
+            parameterList.add(value)
+            if (parameter.type.isMarkedNullable) {
+                parameterListWithNullable.add(null)
+            } else {
+                parameterListWithNullable.add(value)
+            }
         }
         val parameters = parameterList.toArray()
+        val parametersWithNull = parameterListWithNullable.toArray()
 
         val element = constructor.call(*parameters)
+        val elementWithNull = constructor.call(*parametersWithNull)
         val meta = metaProvider.getMeta(subject.java)
 
         // check columns make sense
@@ -54,6 +72,27 @@ class MetaProviderTest {
         // check serialize
         val elementArray = meta.toArray(element)
         assertContentEqual(elementArray, parameters)
+
+        // check unserialize with nullable
+        val parsedElementWithNull = meta.getRowParser().parseRow(parametersWithNull)
+        assertContentEqual(parsedElementWithNull, elementWithNull)
+
+        // check serialize with nullable
+        val elementArrayWithNull = meta.toArray(elementWithNull)
+        assertContentEqual(elementArrayWithNull, parametersWithNull)
+    }
+
+    private fun getValueForType(
+        classifier: KClassifier?,
+        index: Int
+    ): Any {
+        return when (classifier) {
+            Int::class -> index
+            String::class -> index.toString()
+            Double::class -> index.toDouble()
+            Boolean::class -> index % 2 == 0
+            else -> throw IllegalArgumentException("unknown type: " + classifier.toString())
+        }
     }
 
     private fun <T : Any> assertContentEqual(one: T, two: T) {
