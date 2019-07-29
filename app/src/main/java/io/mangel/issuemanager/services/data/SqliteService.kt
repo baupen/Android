@@ -22,6 +22,39 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
         }
     }
 
+    fun <T : SqliteEntry> store(elements: List<T>) {
+        if (elements.isEmpty()) {
+            return
+        }
+
+        val meta = metaProvider.getMeta(elements.first().javaClass)
+
+        val tableName = meta.getTableName()
+        val fieldList = meta.getFieldList().joinToString(separator = ",")
+        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { _ -> "?" }
+
+        db.use {
+            val sqlStatement = "INSERT OR REPLACE INTO $tableName($fieldList) VALUES ($valuesPlaceholders)"
+
+            for (element in elements) {
+                execSQL(sqlStatement, meta.toArray(element))
+            }
+        }
+    }
+
+    fun <T : SqliteEntry> remove(classOfT: Class<T>, elements: List<String>) {
+        if (elements.isEmpty()) {
+            return
+        }
+
+        val meta = metaProvider.getMeta(classOfT)
+        val tableName = meta.getTableName()
+
+        db.use {
+            val sqlStatement = "DELETE FROM $tableName WHERE id IN (${elements.joinToString(separator = ",")})"
+        }
+    }
+
     fun <T : SqliteEntry> getIdLastChangeTimePair(classOfT: Class<T>): List<ObjectMeta> {
         val meta = metaProvider.getMeta(classOfT)
         val rowParser = IDLastChangeTimePairRowParser()

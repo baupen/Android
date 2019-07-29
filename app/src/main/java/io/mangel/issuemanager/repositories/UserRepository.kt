@@ -6,6 +6,7 @@ import io.mangel.issuemanager.api.CreateTrialAccountRequest
 import io.mangel.issuemanager.api.tasks.*
 import io.mangel.issuemanager.events.AuthenticationSuccessfulEvent
 import io.mangel.issuemanager.events.UserLoadedEvent
+import io.mangel.issuemanager.events.UserRefreshedEvent
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.*
@@ -81,6 +82,12 @@ class UserRepository(
         }
 
         return user
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onUserRefreshedEvent(event: UserRefreshedEvent) {
+        user = event.user
     }
 
     @Suppress("unused")
