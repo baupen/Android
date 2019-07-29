@@ -32,13 +32,14 @@ public class ApplicationFactory(context: Context) {
     private val storeConverter = StoreConverter()
     private val modelConverter = ModelConverter()
 
+    private val fileService = FileService(context.filesDir)
+
     private val serializationService = SerializationService()
-    private val httpService = RestHttpService(notificationService)
+    private val httpService = RestHttpService(notificationService, fileService)
     private val clientFactory = ClientFactory(httpService, serializationService)
 
     private val sharedPreferences = context.getSharedPreferences("io.mangel.issuemanager", Context.MODE_PRIVATE)
     private val settingService = SettingService(sharedPreferences, serializationService)
-    private val fileService = FileService(context.filesDir)
     private val domainService = DomainService()
     private val metaProvider = MetaProvider()
 

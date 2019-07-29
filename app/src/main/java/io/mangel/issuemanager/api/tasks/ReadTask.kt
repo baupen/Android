@@ -31,13 +31,13 @@ class ReadTask(client: Client) : AbstractApiAsyncTask<ReadRequest, ReadResponse>
 
 class ReadTaskFinished(
     val changedCraftsmen: List<Craftsman>,
-    val removedCraftsmanIDs: List<UUID>,
+    val removedCraftsmanIDs: List<String>,
     val changedConstructionSites: List<ConstructionSite>,
-    val removedConstructionSiteIDs: List<UUID>,
+    val removedConstructionSiteIDs: List<String>,
     val changedMaps: List<Map>,
-    val removedMapIDs: List<UUID>,
+    val removedMapIDs: List<String>,
     val changedIssues: List<Issue>,
-    val removedIssueIDs: List<UUID>,
+    val removedIssueIDs: List<String>,
     val changedUser: User?
 ) : ApiCallSucceeded()
 

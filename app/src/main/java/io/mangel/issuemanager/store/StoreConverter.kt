@@ -39,8 +39,8 @@ class StoreConverter {
     fun convert(map: Map): io.mangel.issuemanager.store.Map {
         return Map(
             map.meta.id,
-            map.constructionSiteId,
-            map.parentId,
+            map.constructionSiteID,
+            map.parentID,
             map.name,
             collisionFreeFilename(map.file),
             map.meta.lastChangeTime
@@ -74,7 +74,7 @@ class StoreConverter {
     fun convert(craftsman: Craftsman): io.mangel.issuemanager.store.Craftsman {
         return Craftsman(
             craftsman.meta.id,
-            craftsman.constructionSiteId,
+            craftsman.constructionSiteID,
             craftsman.name,
             craftsman.trade,
             craftsman.meta.lastChangeTime

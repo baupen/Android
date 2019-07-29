@@ -89,7 +89,7 @@ class SyncRepository(
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTaskFinishedEvent(event: TaskFinishedEvent) {
-        if (event.taskType == FileDownloadTask::class) {
+        if (event.taskType == FileDownloadTask::class.java) {
             someRefreshTaskHasFinished()
         }
     }
@@ -155,22 +155,22 @@ class SyncRepository(
         // process construction sites
         val storeConstructionSites = event.changedConstructionSites.map { cs -> storeConverter.convert(cs) }
         constructionSiteDataService.store(storeConstructionSites)
-        constructionSiteDataService.delete(event.removedConstructionSiteIDs.map { cs -> cs.toString() })
+        constructionSiteDataService.delete(event.removedConstructionSiteIDs)
 
         // process craftsman
         val storeCraftsmen = event.changedCraftsmen.map { cs -> storeConverter.convert(cs) }
         craftsmanDataService.store(storeCraftsmen)
-        craftsmanDataService.delete(event.removedCraftsmanIDs.map { cs -> cs.toString() })
+        craftsmanDataService.delete(event.removedCraftsmanIDs)
 
         // process maps
         val storeMaps = event.changedMaps.map { cs -> storeConverter.convert(cs) }
         mapDataService.store(storeMaps)
-        mapDataService.delete(event.removedMapIDs.map { cs -> cs.toString() })
+        mapDataService.delete(event.removedMapIDs)
 
         // process issues
         val storeIssues = event.changedIssues.map { cs -> storeConverter.convert(cs) }
         issueDataService.store(storeIssues)
-        issueDataService.delete(event.removedIssueIDs.map { cs -> cs.toString() })
+        issueDataService.delete(event.removedIssueIDs)
     }
 
     private fun refreshUser(apiUser: io.mangel.issuemanager.api.User) {

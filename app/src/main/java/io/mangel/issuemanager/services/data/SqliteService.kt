@@ -128,7 +128,7 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
 }
 
 class IssueManagerDatabaseContext(private val metaProvider: MetaProvider, context: Context) :
-    ManagedSQLiteOpenHelper(context, "Issues", null, 1) {
+    ManagedSQLiteOpenHelper(context, "Issues.sqlite", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
         for (table in metaProvider.supported) {

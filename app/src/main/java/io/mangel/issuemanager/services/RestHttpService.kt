@@ -9,7 +9,7 @@ import java.io.IOException
 import java.net.UnknownHostException
 
 
-class RestHttpService(private val notificationService: NotificationService) {
+class RestHttpService(private val notificationService: NotificationService, private val fileService: FileService) {
     companion object {
         private val MEDIA_TYPE_JSON = ("application/json; charset=utf-8").toMediaType()
         private val MEDIA_TYPE_IMAGE = ("image/jpeg").toMediaType()
@@ -80,8 +80,7 @@ class RestHttpService(private val notificationService: NotificationService) {
             val body = response.body
             if (body != null) {
                 if (successful) {
-                    val file = File(filePath)
-                    file.writeBytes(body.bytes())
+                    fileService.save(filePath, body.bytes())
                 } else {
                     errorBody = body.string()
                 }
