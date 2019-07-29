@@ -28,7 +28,7 @@ abstract class AbstractProgressAsyncTask<T1, T2>() : AsyncTask<T1, AbstractProgr
 
     override fun onPreExecute() {
         super.onPreExecute()
-        EventBus.getDefault().post(ProgressTaskStartedEvent(asyncTaskId))
+        EventBus.getDefault().post(ProgressTaskStartedEvent(asyncTaskId, this.javaClass))
     }
 
     override fun onProgressUpdate(vararg values: ProgressUpdate<T2>) {
@@ -44,7 +44,7 @@ abstract class AbstractProgressAsyncTask<T1, T2>() : AsyncTask<T1, AbstractProgr
     override fun onPostExecute(result: Unit) {
         super.onPostExecute(result)
 
-        EventBus.getDefault().post(TaskFinishedEvent(asyncTaskId))
+        EventBus.getDefault().post(TaskFinishedEvent(asyncTaskId, this.javaClass))
     }
 
     class ProgressUpdate<T>(val response: T, val progress: Int, val max: Int)

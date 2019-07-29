@@ -4,13 +4,14 @@ import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.DomainOverride
 import io.mangel.issuemanager.api.tasks.DomainOverridesTask
 import io.mangel.issuemanager.api.tasks.DomainOverridesTaskFinished
+import io.mangel.issuemanager.factories.ClientFactory
 import io.mangel.issuemanager.services.RestHttpService
 import io.mangel.issuemanager.services.SerializationService
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class DomainOverridesRepository(private val httpService: RestHttpService, private val serializationService: SerializationService) {
+class DomainOverridesRepository(private val clientFactory: ClientFactory) {
     companion object {
         const val DOMAIN_OVERRIDES_HOST = "https://app.mangel.io"
     }
@@ -23,7 +24,7 @@ class DomainOverridesRepository(private val httpService: RestHttpService, privat
     var domainOverrides: List<DomainOverride> = _domainOverrides
 
     fun loadDomainOverrides() {
-        val client = Client(DOMAIN_OVERRIDES_HOST, httpService, serializationService)
+        val client = clientFactory.getClient(DOMAIN_OVERRIDES_HOST)
         val domainOverridesTask = DomainOverridesTask(client)
         domainOverridesTask.execute("once")
     }

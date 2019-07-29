@@ -7,6 +7,7 @@ import io.mangel.issuemanager.api.tasks.*
 import io.mangel.issuemanager.events.AuthenticationSuccessfulEvent
 import io.mangel.issuemanager.events.UserLoadedEvent
 import io.mangel.issuemanager.events.UserRefreshedEvent
+import io.mangel.issuemanager.factories.ClientFactory
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.*
@@ -22,14 +23,12 @@ import java.security.MessageDigest
 
 
 class UserRepository(
-    private val httpService: RestHttpService,
     private val domainServiceRepository: DomainOverridesRepository,
     private val domainService: DomainService,
     private val storeConverter: StoreConverter,
     private val modelConverter: ModelConverter,
-    private val sqliteService: SqliteService,
     private val settingService: SettingService,
-    private val serializationService: SerializationService
+    private val clientFactory: ClientFactory
 ) {
     companion object {
         const val TRIAL_ACCOUNT_HOST = DomainOverridesRepository.DOMAIN_OVERRIDES_HOST
@@ -55,7 +54,7 @@ class UserRepository(
         val username = domainOverrider.getLoginEmail()
         val loginRequest = LoginRequest(username, passwordHash)
 
-        val client = Client(domainOverrider.getHost(), httpService, serializationService)
+        val client = clientFactory.getClient(domainOverrider.getHost())
         val loginTask = LoginTask(client)
         loginTask.execute(loginRequest)
     }
@@ -63,7 +62,7 @@ class UserRepository(
     fun createTrialAccount(proposedGivenName: String, proposedFamilyName: String) {
         val loginRequest = CreateTrialAccountRequest(proposedGivenName, proposedFamilyName)
 
-        val client = Client(TRIAL_ACCOUNT_HOST, httpService, serializationService)
+        val client = clientFactory.getClient(TRIAL_ACCOUNT_HOST)
         val trialAccountTask = CreateTrialAccountTask(client)
         trialAccountTask.execute(loginRequest)
     }

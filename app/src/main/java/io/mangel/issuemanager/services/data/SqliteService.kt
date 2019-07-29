@@ -55,22 +55,38 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
         }
     }
 
-    fun <T : SqliteEntry> getIdLastChangeTimePair(classOfT: Class<T>): List<ObjectMeta> {
+    fun <T : SqliteEntry> getAllAsObjectMeta(classOfT: Class<T>): List<ObjectMeta> {
         val meta = metaProvider.getMeta(classOfT)
-        val rowParser = IDLastChangeTimePairRowParser()
+        val rowParser = MetaRowParser()
         return db.use {
             select(meta.getTableName(), SqliteEntry::id.name, SqliteEntry::lastChangeTime.name)
+                .whereArgs("")
                 .exec {
                     return@exec parseList(rowParser)
                 }
         }
     }
 
-    class IDLastChangeTimePairRowParser : RowParser<ObjectMeta> {
+    fun <T : SqliteEntry, T2 : Any> getAllWithNonNullFieldAsCustom(
+        classOfT: Class<T>,
+        rowParser: RowParser<T2>,
+        nonNullField: String,
+        vararg fields: String
+    ): List<T2> {
+        val meta = metaProvider.getMeta(classOfT)
+        return db.use {
+            select(meta.getTableName(), nonNullField, *fields)
+                .whereArgs("$nonNullField IS NOT NULL")
+                .exec {
+                    return@exec parseList(rowParser)
+                }
+        }
+    }
+
+    class MetaRowParser : RowParser<ObjectMeta> {
         override fun parseRow(columns: Array<Any?>): ObjectMeta {
             return ObjectMeta(columns[0] as String, columns[1] as String)
         }
-
     }
 
 

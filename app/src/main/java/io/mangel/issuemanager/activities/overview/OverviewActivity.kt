@@ -18,6 +18,9 @@ class OverviewActivity : AbstractActivity() {
         } else {
             initializeView(user)
         }
+
+        val constructionSites = getApplicationFactory().constructionSiteRepository.getConstructionSites()
+        getApplicationFactory().syncRepository.refresh()
     }
 
     private fun initializeView(user: User) {
