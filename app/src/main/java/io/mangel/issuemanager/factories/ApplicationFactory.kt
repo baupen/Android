@@ -32,7 +32,7 @@ public class ApplicationFactory(context: Context) {
     private val storeConverter = StoreConverter()
     private val modelConverter = ModelConverter()
 
-    private val fileService = FileService(context.filesDir)
+    val fileService = FileService(context.filesDir)
 
     private val serializationService = SerializationService()
     private val httpService = RestHttpService(notificationService, fileService)

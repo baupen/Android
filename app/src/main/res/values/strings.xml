@@ -16,4 +16,5 @@
     </string>
     <string name="no_internet_access">Eine Verbindung mit dem Internet ist nicht möglich.</string>
     <string name="welcome">Willkommen, %s!</string>
+    <string name="construction_site">Baustelle</string>
 </resources>

@@ -1,31 +1,55 @@
 package io.mangel.issuemanager.services
 
+import io.mangel.issuemanager.events.TaskProgressEvent
 import io.mangel.issuemanager.events.TaskFinishedEvent
 import io.mangel.issuemanager.events.TaskStartedEvent
 import java.util.*
-import kotlin.collections.HashSet
 
 class LoadingService(private val loadingIndicator: LoadingIndicator) {
 
-    private val activeTasks = HashSet<UUID>()
+    private var taskActive: MutableMap<UUID, Boolean> = HashMap()
+    private var progressByTask: MutableMap<UUID, Int> = HashMap()
+    private var maxByTask: HashMap<UUID, Int> = HashMap()
 
-    fun onTaskStartedEventReceived(taskStartedEvent: TaskStartedEvent) {
-        activeTasks.add(taskStartedEvent.taskId)
+    fun onStarted(event: TaskStartedEvent) {
+        if (!taskActive.any()) {
+            loadingIndicator.showIndeterminateProgress()
+        }
 
-        loadingIndicator.showLoadingIndicator()
+        taskActive[event.taskId] = true;
     }
 
-    fun onTaskFinishedEventReceived(taskFinishedEvent: TaskFinishedEvent) {
-        activeTasks.remove(taskFinishedEvent.taskId)
+    fun onProgress(event: TaskProgressEvent) {
+        progressByTask[event.taskId] = event.progress;
+        maxByTask[event.taskId] = event.max;
 
-        if (activeTasks.isEmpty()) {
-            loadingIndicator.hideLoadingIndicator()
+        showDeterminateProgress()
+    }
+
+    fun onFinished(event: TaskFinishedEvent) {
+        taskActive[event.taskId] = false;
+        progressByTask[event.taskId] = maxByTask[event.taskId]!!;
+
+        if (taskActive.values.none { it }) {
+            taskActive = HashMap();
+            progressByTask = HashMap();
+            maxByTask = HashMap();
+
+            loadingIndicator.hide()
+        } else {
+            showDeterminateProgress()
         }
     }
 
-    interface LoadingIndicator {
-        fun hideLoadingIndicator()
+    private fun showDeterminateProgress() {
+        loadingIndicator.showDeterminateProgress(progressByTask.values.sum(), maxByTask.values.sum())
+    }
 
-        fun showLoadingIndicator()
+    interface LoadingIndicator {
+        fun showIndeterminateProgress()
+
+        fun showDeterminateProgress(progress: Int, max: Int)
+
+        fun hide()
     }
 }

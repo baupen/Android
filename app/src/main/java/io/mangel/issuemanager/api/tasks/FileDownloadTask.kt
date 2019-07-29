@@ -1,12 +1,7 @@
 package io.mangel.issuemanager.api.tasks
 
-import android.os.AsyncTask
 import io.mangel.issuemanager.api.*
-import io.mangel.issuemanager.events.ProgressTaskProgressEvent
-import io.mangel.issuemanager.events.ProgressTaskStartedEvent
-import io.mangel.issuemanager.events.TaskFinishedEvent
 import org.greenrobot.eventbus.EventBus
-import java.util.*
 
 
 class FileDownloadTask(private val client: Client) :

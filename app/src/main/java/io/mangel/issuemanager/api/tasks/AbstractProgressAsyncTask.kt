@@ -1,8 +1,7 @@
 package io.mangel.issuemanager.api.tasks
 
 import android.os.AsyncTask
-import io.mangel.issuemanager.api.Client
-import io.mangel.issuemanager.events.ProgressTaskProgressEvent
+import io.mangel.issuemanager.events.TaskProgressEvent
 import io.mangel.issuemanager.events.ProgressTaskStartedEvent
 import io.mangel.issuemanager.events.TaskFinishedEvent
 import org.greenrobot.eventbus.EventBus
@@ -37,7 +36,7 @@ abstract class AbstractProgressAsyncTask<T1, T2>() : AsyncTask<T1, AbstractProgr
         for (progressUpdate in values) {
             onExecutionFinished(progressUpdate.response)
 
-            EventBus.getDefault().post(ProgressTaskProgressEvent(asyncTaskId, progressUpdate.progress, progressUpdate.max))
+            EventBus.getDefault().post(TaskProgressEvent(asyncTaskId, progressUpdate.progress, progressUpdate.max))
         }
     }
 

@@ -6,6 +6,7 @@ import io.mangel.issuemanager.repositories.base.AuthenticatedRepository
 import io.mangel.issuemanager.services.DomainService
 import io.mangel.issuemanager.services.RestHttpService
 import io.mangel.issuemanager.services.data.ConstructionSiteDataService
+import org.greenrobot.eventbus.EventBus
 
 
 class ConstructionSiteRepository(
@@ -37,5 +38,9 @@ class ConstructionSiteRepository(
             _constructionSiteById[constructionSite.id] = model
             _constructionSites.add(model)
         }
+
+        EventBus.getDefault().post(ConstructionSitesLoaded())
     }
 }
+
+class ConstructionSitesLoaded
