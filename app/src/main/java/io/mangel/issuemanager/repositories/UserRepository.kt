@@ -5,9 +5,12 @@ import io.mangel.issuemanager.api.LoginRequest
 import io.mangel.issuemanager.api.CreateTrialAccountRequest
 import io.mangel.issuemanager.api.tasks.*
 import io.mangel.issuemanager.events.AuthenticationSuccessfulEvent
+import io.mangel.issuemanager.events.UserLoadedEvent
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.*
+import io.mangel.issuemanager.services.SettingService
+import io.mangel.issuemanager.services.data.SqliteService
 import io.mangel.issuemanager.store.AuthenticationToken
 import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
@@ -71,7 +74,10 @@ class UserRepository(
         val authenticationToken = authenticationToken
         if (user == null && authenticationToken != null) {
             val storeUser = settingService.readUser() ?: return null
-            user = modelConverter.convert(storeUser)
+            val user = modelConverter.convert(storeUser)
+            EventBus.getDefault().post(UserLoadedEvent(user))
+
+            this.user = user
         }
 
         return user

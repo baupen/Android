@@ -2,44 +2,47 @@ package io.mangel.issuemanager.store
 
 import java.util.*
 
-sealed class SqliteEntry<T>
+sealed class SqliteEntry(
+    val id: String,
+    val lastChangeTime: String
+)
 
 class ConstructionSite(
-    val id: String,
+    id: String,
     val name: String,
     val streetAddress: String?,
     val postalCode: String?,
     val locality: String?,
     val country: String?,
     val imagePath: String?,
-    val lastChangeTime: String
+    lastChangeTime: String
 ) :
-    SqliteEntry<User>() {
+    SqliteEntry(id, lastChangeTime) {
 }
 
 class Craftsman(
-    val id: String,
+    id: String,
     val constructionSiteId: String,
     val name: String,
     val trade: String,
-    val lastChangeTime: String
+    lastChangeTime: String
 ) :
-    SqliteEntry<User>() {
+    SqliteEntry(id, lastChangeTime) {
 }
 
 class Map(
-    val id: String,
+    id: String,
     val constructionSiteId: String,
     val parentId: String?,
     val name: String,
     val filePath: String?,
-    val lastChangeTime: String
+    lastChangeTime: String
 ) :
-    SqliteEntry<User>() {
+    SqliteEntry(id, lastChangeTime) {
 }
 
 class Issue(
-    val id: String,
+    id: String,
     val mapId: String,
     val wasAddedWithClient: Boolean,
     val number: Int?,
@@ -57,9 +60,9 @@ class Issue(
     val positionY: Double?,
     val zoomScale: Double?,
     val mapFileID: String?,
-    val lastChangeTime: String
+    lastChangeTime: String
 ) :
-    SqliteEntry<User>() {
+    SqliteEntry(id, lastChangeTime) {
 }
 
 data class User(val id: String, val lastChangeTime: String, val givenName: String, val familyName: String)

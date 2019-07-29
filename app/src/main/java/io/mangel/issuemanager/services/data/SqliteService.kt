@@ -1,14 +1,16 @@
-package io.mangel.issuemanager.services
+package io.mangel.issuemanager.services.data
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import io.mangel.issuemanager.api.ObjectMeta
 import io.mangel.issuemanager.store.*
 import org.jetbrains.anko.db.*
 
 class SqliteService(private val metaProvider: MetaProvider, context: Context) {
-    private val db: IssueManagerDatabaseContext = IssueManagerDatabaseContext(metaProvider, context)
+    private val db: IssueManagerDatabaseContext =
+        IssueManagerDatabaseContext(metaProvider, context)
 
-    fun <T: SqliteEntry<T>> store(element: T) {
+    fun <T : SqliteEntry> store(element: T) {
         val meta = metaProvider.getMeta(element.javaClass)
 
         val tableName = meta.getTableName()
@@ -20,7 +22,26 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
         }
     }
 
-    fun <T: SqliteEntry<T>> getById(id: String, classOfT: Class<T>): T? {
+    fun <T : SqliteEntry> getIdLastChangeTimePair(classOfT: Class<T>): List<ObjectMeta> {
+        val meta = metaProvider.getMeta(classOfT)
+        val rowParser = IDLastChangeTimePairRowParser()
+        return db.use {
+            select(meta.getTableName(), SqliteEntry::id.name, SqliteEntry::lastChangeTime.name)
+                .exec {
+                    return@exec parseList(rowParser)
+                }
+        }
+    }
+
+    class IDLastChangeTimePairRowParser : RowParser<ObjectMeta> {
+        override fun parseRow(columns: Array<Any?>): ObjectMeta {
+            return ObjectMeta(columns[0] as String, columns[1] as String)
+        }
+
+    }
+
+
+    fun <T : SqliteEntry> getById(id: String, classOfT: Class<T>): T? {
         val meta = metaProvider.getMeta(classOfT)
         return db.use {
             select(meta.getTableName())
@@ -34,7 +55,17 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
         }
     }
 
-    private fun <T: SqliteEntry<T>> getByRelation(id: String, relationName: String, classOfT: Class<T>): List<T> {
+    fun <T : SqliteEntry> getAll(classOfT: Class<T>): List<T> {
+        val meta = metaProvider.getMeta(classOfT)
+        return db.use {
+            select(meta.getTableName())
+                .exec {
+                    return@exec parseList(meta.getRowParser())
+                }
+        }
+    }
+
+    private fun <T : SqliteEntry> getByRelation(id: String, relationName: String, classOfT: Class<T>): List<T> {
         val meta = metaProvider.getMeta(classOfT)
         return db.use {
             select(meta.getTableName())
@@ -47,7 +78,8 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
 
 }
 
-class IssueManagerDatabaseContext(private val metaProvider: MetaProvider, context: Context) : ManagedSQLiteOpenHelper(context, "Issues", null, 1) {
+class IssueManagerDatabaseContext(private val metaProvider: MetaProvider, context: Context) :
+    ManagedSQLiteOpenHelper(context, "Issues", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
         for (table in metaProvider.supported) {

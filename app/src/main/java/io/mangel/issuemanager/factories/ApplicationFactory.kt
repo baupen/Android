@@ -5,6 +5,8 @@ import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.repositories.DomainOverridesRepository
 import io.mangel.issuemanager.repositories.UserRepository
 import io.mangel.issuemanager.services.*
+import io.mangel.issuemanager.services.SettingService
+import io.mangel.issuemanager.services.data.SqliteService
 import io.mangel.issuemanager.store.MetaProvider
 import io.mangel.issuemanager.store.StoreConverter
 
@@ -29,7 +31,8 @@ public class ApplicationFactory(context: Context) {
     private val serializationService = SerializationService()
     val notificationService = NotificationService(context)
     private val sharedPreferences = context.getSharedPreferences("io.mangel.issuemanager", Context.MODE_PRIVATE)
-    private val settingService = SettingService(sharedPreferences, serializationService)
+    private val settingService =
+        SettingService(sharedPreferences, serializationService)
     private val httpService = RestHttpService(notificationService)
     private val domainService = DomainService()
     private val metaProvider = MetaProvider()

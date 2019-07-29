@@ -1,7 +1,6 @@
 package io.mangel.issuemanager.services
 
 import com.squareup.moshi.Moshi
-import io.mangel.issuemanager.api.Request
 import java.lang.reflect.Type
 
 class SerializationService {
