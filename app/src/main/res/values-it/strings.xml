@@ -24,9 +24,12 @@
     <string name="action_create_trial_account">Probekonto erstellen</string>
     <string name="or">oder</string>
     <string name="trial_account_created">Ihr Probeaccount wurde erstellt."</string>
-    <string name="trial_account_help">Besuchen Sie uns unter www.app.mangel.io um die in der App erfassen Pendenzen weiter zu verwalten. \n\n
+    <string name="trial_account_help">Besuchen Sie uns unter www.app.mangel.io um die in der App erfassen Pendenzen
+        weiter zu verwalten. \n\n
         Dazu brauchen Sie die folgenden Zugangsdaten: \n
         Benutzername: %s\n
         Passwort: %s
     </string>
+    <string name="please_login">Bitte einloggen</string>
+    <string name="login_with_email">Benutzen Sie Ihre Geschäftsmail.</string>
 </resources>

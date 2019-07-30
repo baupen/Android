@@ -37,13 +37,29 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
 
         viewHolder.createTrialAccountButton.setOnClickListener {
             viewHolder.loadingProgressBar.visibility = View.VISIBLE
+            viewHolder.loginWrapper.visibility = View.GONE
             context.createTrialAccount()
         }
 
         viewHolder.loginButton.setOnClickListener {
             viewHolder.loadingProgressBar.visibility = View.VISIBLE
+            viewHolder.loginWrapper.visibility = View.GONE
             login()
         }
+    }
+
+    override fun getLoadingIndicator(): ProgressBar {
+        return viewHolder.loadingProgressBar
+    }
+
+    override fun hide() {
+        super.hide()
+        viewHolder.loginWrapper.visibility = View.VISIBLE
+    }
+
+    override fun show() {
+        super.show()
+        viewHolder.loginWrapper.visibility = View.GONE
     }
 
     private fun login() {
@@ -56,8 +72,8 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
     private fun checkCanSubmit() {
         val usernameBlank = viewHolder.usernameExitText.text.isBlank()
         val passwordBlank = viewHolder.passwordEditText.text.isBlank()
-        usernameTouched = usernameBlank || usernameTouched
-        passwordTouched = passwordBlank || passwordTouched
+        usernameTouched = !usernameBlank || usernameTouched
+        passwordTouched = !passwordBlank || passwordTouched
 
         if (usernameBlank && usernameTouched) {
             viewHolder.usernameExitText.error = context.getString(R.string.invalid_email)
@@ -74,10 +90,6 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         fun createTrialAccount()
     }
 
-    override fun getLoadingIndicator(): ProgressBar {
-        return viewHolder.loadingProgressBar
-    }
-
     fun setUsernamePassword(username: String, password: String) {
         viewHolder.usernameExitText.setText(username, TextView.BufferType.EDITABLE)
         viewHolder.passwordEditText.setText(password, TextView.BufferType.EDITABLE)
@@ -91,5 +103,6 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         val loginButton: Button = view.login
         val createTrialAccountButton: Button = view.create_trial_account
         val loadingProgressBar: ProgressBar = view.loading
+        val loginWrapper: View = view.login_wrapper
     }
 }
