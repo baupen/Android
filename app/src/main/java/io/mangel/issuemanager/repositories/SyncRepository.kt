@@ -14,6 +14,7 @@ import io.mangel.issuemanager.services.data.ConstructionSiteDataService
 import io.mangel.issuemanager.services.data.CraftsmanDataService
 import io.mangel.issuemanager.services.data.IssueDataService
 import io.mangel.issuemanager.services.data.MapDataService
+import io.mangel.issuemanager.store.AuthenticationToken
 import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -102,44 +103,50 @@ class SyncRepository(
     }
 
     private fun downloadFiles() {
-        val authToken = authenticationService.getAuthenticationToken()
         val fileDownloadTasks = ArrayList<FileDownloadTaskEntry>()
+        val allFiles = ArrayList<String>()
 
         val constructionSiteImages = constructionSiteDataService.getConstructionSiteImages()
         for (image in constructionSiteImages) {
-            if (!fileService.exists(image.imagePath)) {
-                val fileDownloadRequest =
-                    FileDownloadRequest(authToken.authenticationToken, constructionSite = image.meta)
-                val fileDownloadTaskEntry = FileDownloadTaskEntry(fileDownloadRequest, image.imagePath)
-                fileDownloadTasks.add(fileDownloadTaskEntry)
-            }
+            addDownloadTaskIfImageMissing(
+                image.imagePath,
+                image.meta,
+                { authToken, meta -> FileDownloadRequest(authToken, constructionSite = meta) },
+                fileDownloadTasks,
+                allFiles
+            )
         }
 
         val mapFiles = mapDataService.getMapImages()
         for (mapFile in mapFiles) {
-            if (!fileService.exists(mapFile.filePath)) {
-                val fileDownloadRequest =
-                    FileDownloadRequest(authToken.authenticationToken, map = mapFile.meta)
-                val fileDownloadTaskEntry = FileDownloadTaskEntry(fileDownloadRequest, mapFile.filePath)
-                fileDownloadTasks.add(fileDownloadTaskEntry)
-            }
+            addDownloadTaskIfImageMissing(
+                mapFile.filePath,
+                mapFile.meta,
+                { authToken, meta -> FileDownloadRequest(authToken, map = meta) },
+                fileDownloadTasks,
+                allFiles
+            )
         }
 
         val issueImages = issueDataService.getIssueImages()
         for (issueImage in issueImages) {
-            if (!fileService.exists(issueImage.imagePath)) {
-                val fileDownloadRequest =
-                    FileDownloadRequest(authToken.authenticationToken, issue = issueImage.meta)
-                val fileDownloadTaskEntry = FileDownloadTaskEntry(fileDownloadRequest, issueImage.imagePath)
-                fileDownloadTasks.add(fileDownloadTaskEntry)
-            }
+            addDownloadTaskIfImageMissing(
+                issueImage.imagePath,
+                issueImage.meta,
+                { authToken, meta -> FileDownloadRequest(authToken, issue = meta) },
+                fileDownloadTasks,
+                allFiles
+            )
         }
+
+        fileService.deleteOthers(allFiles.toSet())
 
         if (fileDownloadTasks.isEmpty()) {
             return
         }
 
-        val client = clientFactory.getClient(authToken.host)
+        val host = authenticationService.getAuthenticationToken().host
+        val client = clientFactory.getClient(host)
         if (fileDownloadTasks.size > 10) {
             // make two background tasks to parallelize
             val batch1 = fileDownloadTasks.filterIndexed { index, _ -> index % 2 == 0 }
@@ -151,6 +158,23 @@ class SyncRepository(
         } else {
             refreshTasksActive += 1
             FileDownloadTask(client).execute(*fileDownloadTasks.toTypedArray())
+        }
+    }
+
+    private fun addDownloadTaskIfImageMissing(
+        filePath: String,
+        meta: ObjectMeta,
+        createFileDownloadRequest: (authToken: String, meta: ObjectMeta) -> FileDownloadRequest,
+        fileDownloadTasks: ArrayList<FileDownloadTaskEntry>,
+        allFiles: ArrayList<String>
+    ) {
+        allFiles.add(filePath)
+
+        if (!fileService.exists(filePath)) {
+            val authToken = authenticationService.getAuthenticationToken().authenticationToken
+            val fileDownloadRequest = createFileDownloadRequest(authToken, meta)
+            val fileDownloadTaskEntry = FileDownloadTaskEntry(fileDownloadRequest, filePath)
+            fileDownloadTasks.add(fileDownloadTaskEntry)
         }
     }
 
