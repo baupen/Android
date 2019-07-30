@@ -28,9 +28,12 @@ class ConstructionSiteAdapter(
             width = (parent.measuredWidth * .66).toInt()
             _width = width
         }
+
         view.minimumWidth = width
         return ViewHolder(view)
     }
+
+    private val imageLoadFailedViewByFilename = HashMap<String, ViewHolder>()
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val constructionSite = values[position]
@@ -38,15 +41,27 @@ class ConstructionSiteAdapter(
         holder.titleView.text = constructionSite.name
         holder.addressView.text = constructionSite.address.toString()
 
-        if (constructionSite.imagePath != null && fileService.exists(constructionSite.imagePath)) {
-            val imageBytes = fileService.read(constructionSite.imagePath)
-            setImageHeight(holder.imageView)
-            holder.imageView.setImageURI(imageBytes.toUri())
+        if (constructionSite.imagePath != null) {
+            if (!loadImageIfExists(holder, constructionSite.imagePath)) {
+                imageLoadFailedViewByFilename[constructionSite.imagePath] = holder
+            }
         }
 
         holder.itemView.setOnClickListener {
             overview.navigate(constructionSite)
         }
+    }
+
+    private fun loadImageIfExists(holder: ViewHolder, fileName: String): Boolean {
+        if (!fileService.exists(fileName)) {
+            return false;
+        }
+
+        val imageBytes = fileService.read(fileName)
+        setImageHeight(holder.imageView)
+        holder.imageView.setImageURI(imageBytes.toUri())
+
+        return true
     }
 
     private fun setImageHeight(imageView: ImageView) {
@@ -57,6 +72,11 @@ class ConstructionSiteAdapter(
             imageView.minimumHeight = height
             imageView.maxHeight = height
         }
+    }
+
+    fun onFileChanged(fileName: String) {
+        val holder = imageLoadFailedViewByFilename[fileName] ?: return
+        loadImageIfExists(holder, fileName)
     }
 
     override fun getItemCount() = values.size

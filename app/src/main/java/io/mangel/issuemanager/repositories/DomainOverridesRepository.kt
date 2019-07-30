@@ -28,7 +28,7 @@ class DomainOverridesRepository(private val clientFactory: ClientFactory) {
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onDomainOverridesTaskFinished(event: DomainOverridesTaskFinished) {
+    fun on(event: DomainOverridesTaskFinished) {
         _domainOverrides.clear()
         _domainOverrides.addAll(event.domainOverrideRoot.domainOverrides)
     }

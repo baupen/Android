@@ -32,7 +32,8 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
 
         getApplicationFactory().domainRepository.loadDomainOverrides()
         if (getApplicationFactory().userRepository.tryAutomaticLogin()) {
-            navigateToOverview()
+            val name = getApplicationFactory().userRepository.getLoggedInUser().givenName
+            onLoginSuccessful(name)
         }
     }
 
@@ -45,14 +46,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     override fun onRestart() {
         super.onRestart()
 
-
         loginViewModel.resetState()
-    }
-
-    @Suppress("unused")
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onDomainOverridesTaskFailed(domainOverridesTaskFailed: DomainOverridesTaskFailed) {
-        longToast(R.string.no_internet_access)
     }
 
     private fun navigateToOverview() {
@@ -65,7 +59,13 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onLoginFailed(loginTaskFailed: LoginTaskFailed) {
+    fun on(domainOverridesTaskFailed: DomainOverridesTaskFailed) {
+        longToast(R.string.no_internet_access)
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun on(loginTaskFailed: LoginTaskFailed) {
         when (loginTaskFailed.error) {
             Error.UnknownUsername -> longToast(R.string.unknown_email)
             Error.WrongPassword -> longToast(R.string.password_wrong)
@@ -75,7 +75,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onCreateTrialAccountTaskFinished(event: CreateTrialAccountTaskFinished) {
+    fun on(event: CreateTrialAccountTaskFinished) {
         alert(
             getString(R.string.trial_account_help, event.trialUser.username, event.trialUser.password),
             getString(R.string.trial_account_created)
@@ -89,8 +89,12 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
-    fun onLoginTaskFinished(loginTaskFinished: LoginTaskFinished) {
-        loginViewModel.showLoginSuccessful(loginTaskFinished.user.givenName)
+    fun on(loginTaskFinished: LoginTaskFinished) {
+        onLoginSuccessful(loginTaskFinished.user.givenName)
+    }
+
+    private fun onLoginSuccessful(userGivenName: String) {
+        loginViewModel.showLoginSuccessful(userGivenName)
         navigateToOverview()
     }
 }

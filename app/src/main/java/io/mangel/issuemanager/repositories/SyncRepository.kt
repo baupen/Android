@@ -31,6 +31,9 @@ class SyncRepository(
     private val clientFactory: ClientFactory,
     private val authenticationService: AuthenticationService
 ) {
+    init {
+        EventBus.getDefault().register(this)
+    }
 
     private var refreshTasksActive = 0
 
@@ -67,13 +70,13 @@ class SyncRepository(
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onReadTaskFinished(event: ReadTaskFinished) {
+    fun on(event: ReadTaskFinished) {
         if (event.changedUser != null) {
             refreshUser(event.changedUser)
         }
 
         processChangedAndDeletedElements(event)
-        EventBus.getDefault().post(ConstructionSitesSavedEvent())
+        EventBus.getDefault().post(SavedConstructionSitesEvent())
 
         downloadFiles()
 
@@ -82,13 +85,13 @@ class SyncRepository(
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onReadTaskFailed(event: ReadTaskFailed) {
+    fun on(event: ReadTaskFailed) {
         someRefreshTaskHasFinished()
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onTaskFinishedEvent(event: TaskFinishedEvent) {
+    fun on(event: TaskFinishedEvent) {
         if (event.taskType == FileDownloadTask::class.java) {
             someRefreshTaskHasFinished()
         }
@@ -157,7 +160,7 @@ class SyncRepository(
         constructionSiteDataService.store(storeConstructionSites)
         constructionSiteDataService.delete(event.removedConstructionSiteIDs)
         if (storeConstructionSites.isNotEmpty() || event.removedConstructionSiteIDs.isNotEmpty()) {
-            EventBus.getDefault().post(ConstructionSitesSavedEvent())
+            EventBus.getDefault().post(SavedConstructionSitesEvent())
         }
 
         // process craftsman
@@ -165,7 +168,7 @@ class SyncRepository(
         craftsmanDataService.store(storeCraftsmen)
         craftsmanDataService.delete(event.removedCraftsmanIDs)
         if (storeCraftsmen.isNotEmpty() || event.removedCraftsmanIDs.isNotEmpty()) {
-            EventBus.getDefault().post(CraftsmanSavedEvent())
+            EventBus.getDefault().post(SavedCraftsmenEvent())
         }
 
         // process maps
@@ -173,7 +176,7 @@ class SyncRepository(
         mapDataService.store(storeMaps)
         mapDataService.delete(event.removedMapIDs)
         if (storeMaps.isNotEmpty() || event.removedMapIDs.isNotEmpty()) {
-            EventBus.getDefault().post(MapsSavedEvent())
+            EventBus.getDefault().post(SavedMapsEvent())
         }
 
         // process issues
@@ -181,7 +184,7 @@ class SyncRepository(
         issueDataService.store(storeIssues)
         issueDataService.delete(event.removedIssueIDs)
         if (storeIssues.isNotEmpty() || event.removedIssueIDs.isNotEmpty()) {
-            EventBus.getDefault().post(IssuesSavedEvent())
+            EventBus.getDefault().post(SavedIssuesEvent())
         }
     }
 
@@ -189,7 +192,6 @@ class SyncRepository(
         val storeUser = storeConverter.convert(apiUser)
         settingService.saveUser(storeUser)
 
-        val user = modelConverter.convert(storeUser)
-        EventBus.getDefault().post(UserSavedEvent(user))
+        EventBus.getDefault().post(SavedUserEvent(storeUser))
     }
 }

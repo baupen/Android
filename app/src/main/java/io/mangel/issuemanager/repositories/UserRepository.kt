@@ -3,7 +3,8 @@ package io.mangel.issuemanager.repositories
 import io.mangel.issuemanager.api.LoginRequest
 import io.mangel.issuemanager.api.CreateTrialAccountRequest
 import io.mangel.issuemanager.api.tasks.*
-import io.mangel.issuemanager.events.UserSavedEvent
+import io.mangel.issuemanager.events.LoadedUserEvent
+import io.mangel.issuemanager.events.SavedUserEvent
 import io.mangel.issuemanager.factories.ClientFactory
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
@@ -36,7 +37,9 @@ class UserRepository(
 
     fun tryAutomaticLogin(): Boolean {
         val token = settingService.readAuthenticationToken() ?: return false
+        val user = settingService.readUser() ?: return false
         authenticationService.setAuthenticationToken(token)
+        setUser(user)
 
         return true
     }
@@ -67,10 +70,8 @@ class UserRepository(
         var user = _user
 
         if (user == null) {
-            val storeUser = settingService.readUser() ?: throw IllegalAccessException("No user saved")
-            user = modelConverter.convert(storeUser)
-
-            this._user = user
+            val storeUser = settingService.readUser() ?: throw IllegalAccessException("No user set")
+            user = setUser(storeUser)
         }
 
         return user
@@ -78,27 +79,34 @@ class UserRepository(
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun on(event: UserSavedEvent) {
-        _user = event.user
+    fun on(event: SavedUserEvent) {
+        setUser(event.user)
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onLoginTaskFinished(event: LoginTaskFinished) {
+    fun on(event: LoginTaskFinished) {
         val previousUser = settingService.readUser()
         if (previousUser != null && previousUser.id != event.user.meta.id) {
             authenticationService.clearUserData()
         }
 
         val storeUser = storeConverter.convert(event.user)
-
         settingService.saveUser(storeUser)
-
-        _user = modelConverter.convert(storeUser)
 
         val authenticationToken = storeConverter.getAuthenticationToken(event.host, event.user)
         authenticationService.setAuthenticationToken(authenticationToken)
         settingService.saveAuthenticationToken(authenticationToken)
+
+        setUser(storeUser)
+    }
+
+    private fun setUser(storeUser: io.mangel.issuemanager.store.User): User {
+        val user = modelConverter.convert(storeUser)
+        _user = user
+
+        EventBus.getDefault().post(LoadedUserEvent())
+        return user;
     }
 
     private fun getSHA256Hash(text: String): String {

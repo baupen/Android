@@ -20,13 +20,25 @@ data class OverviewViewModel<T>(private val context: T, private val view: View, 
 
     private val viewHolder = ViewHolder(view)
 
+    private var _constructionSiteAdapter: ConstructionSiteAdapter? = null
+
     init {
+        displayUser()
+        displayConstructionSites()
+        displayAbnahmeModus()
+    }
+
+    private fun displayUser() {
         viewHolder.welcomeTextView.text = context.getString(R.string.welcome, payload.user.givenName);
+    }
 
-        val locationAdapter =
+    private fun displayConstructionSites() {
+        _constructionSiteAdapter =
             ConstructionSiteAdapter(payload.constructionSites, context, payload.applicationFactory.fileService)
-        viewHolder.constructionSiteRecyclerView.adapter = locationAdapter
+        viewHolder.constructionSiteRecyclerView.adapter = _constructionSiteAdapter
+    }
 
+    private fun displayAbnahmeModus() {
         viewHolder.abnahmemodusSwitch.isChecked = payload.isAbnahmeModusActive
         viewHolder.abnahmemodusSwitch.setOnCheckedChangeListener { _, value ->
             context.setAbnahmeModusActive(value)
@@ -41,6 +53,18 @@ data class OverviewViewModel<T>(private val context: T, private val view: View, 
 
     override fun getLoadingIndicator(): ProgressBar {
         return viewHolder.loadingProgressBar
+    }
+
+    fun onConstructionSitesChanged() {
+        viewHolder.constructionSiteRecyclerView.adapter?.notifyDataSetChanged()
+    }
+
+    fun onUserChanged() {
+        displayUser()
+    }
+
+    fun onFileDownloaded(filename: String) {
+        _constructionSiteAdapter?.onFileChanged(filename)
     }
 
     class Payload(

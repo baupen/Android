@@ -1,9 +1,16 @@
 package io.mangel.issuemanager.events
 
-import io.mangel.issuemanager.models.User
+import io.mangel.issuemanager.store.User
 
-class UserSavedEvent(val user: User)
-class ConstructionSitesSavedEvent()
-class MapsSavedEvent()
-class IssuesSavedEvent()
-class CraftsmanSavedEvent()
+/**
+ * Events issued if agents outside of the respective repository change the entity
+ *
+ * So if the SyncRepository modifies some ConstructionSite and saves it to the database
+ * it must issue a SavedConstructionSitesEvent so that the ConstructionSiteRepository can pick up the changes
+ */
+
+class SavedUserEvent(val user: User)
+class SavedConstructionSitesEvent
+class SavedMapsEvent
+class SavedIssuesEvent
+class SavedCraftsmenEvent

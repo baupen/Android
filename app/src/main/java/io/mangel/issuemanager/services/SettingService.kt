@@ -8,7 +8,6 @@ class SettingService(
     private val preferences: SharedPreferences,
     private val serializationService: SerializationService
 ) {
-
     fun saveUser(user: User) {
         save(SettingKey.User, user)
     }
