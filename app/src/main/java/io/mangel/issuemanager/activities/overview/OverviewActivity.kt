@@ -10,16 +10,13 @@ import io.mangel.issuemanager.events.LoadedUserEvent
 import io.mangel.issuemanager.models.ConstructionSite
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.contentView
-import org.jetbrains.anko.startActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.iterator
 import io.mangel.issuemanager.activities.login.LoginActivity
 import io.mangel.issuemanager.repositories.SyncFinishedEvent
 import io.mangel.issuemanager.repositories.SyncStartedEvent
-import org.jetbrains.anko.clearTop
-import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.*
 
 
 class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
@@ -41,7 +38,8 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
         when (item.itemId) {
             R.id.logout -> {
                 getApplicationFactory().userRepository.logout()
-                startActivity(intentFor<LoginActivity>().clearTop())
+                startActivity(intentFor<LoginActivity>().clearTop().noHistory())
+                finish()
             }
             R.id.refresh -> getApplicationFactory().syncRepository.sync()
         }
@@ -100,6 +98,8 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     fun on(event: SyncFinishedEvent) {
         syncActive = false
         invalidateOptionsMenu()
+
+        toast(getString(R.string.sync_finished))
     }
 
     @Suppress("unused")

@@ -49,10 +49,6 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
         loginViewModel.resetState()
     }
 
-    private fun navigateToOverview() {
-        startActivity(intentFor<OverviewActivity>().clearTop())
-    }
-
     override fun login(email: String, password: String) {
         getApplicationFactory().userRepository.login(email, password)
     }
@@ -95,6 +91,6 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
 
     private fun onLoginSuccessful(userGivenName: String) {
         loginViewModel.showLoginSuccessful(userGivenName)
-        navigateToOverview()
+        startActivity<OverviewActivity>()
     }
 }
