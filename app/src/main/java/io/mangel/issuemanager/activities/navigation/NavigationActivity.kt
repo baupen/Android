@@ -14,6 +14,6 @@ class NavigationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
-        intent.extras
+        actionBar?.setDisplayHomeAsUpEnabled(true)
     }
 }

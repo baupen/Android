@@ -14,11 +14,14 @@
             android:theme="@style/AppTheme">
         <activity android:name=".activities.navigation.NavigationActivity">
         </activity>
-        <activity android:name=".activities.overview.OverviewActivity">
+        <activity
+                android:name=".activities.overview.OverviewActivity"
+        >
         </activity>
         <activity
                 android:name=".activities.login.LoginActivity"
-                android:label="@string/app_name">
+                android:label="@string/app_name"
+                android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

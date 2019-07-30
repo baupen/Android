@@ -19,6 +19,7 @@ import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.io.SyncFailedException
 
 class SyncRepository(
     private val storeConverter: StoreConverter,
@@ -38,7 +39,7 @@ class SyncRepository(
 
     private var refreshTasksActive = 0
 
-    fun refresh() {
+    fun sync() {
         synchronized(this) {
             if (refreshTasksActive > 0) {
                 return
@@ -49,6 +50,8 @@ class SyncRepository(
 
         val authToken = authenticationService.getAuthenticationToken()
         val user = settingService.readUser() ?: return
+
+        EventBus.getDefault().post(SyncStartedEvent())
 
         val userMeta = ObjectMeta(user.id, user.lastChangeTime)
         val craftsmanMetas = craftsmanDataService.getAllAsObjectMeta()
@@ -100,6 +103,10 @@ class SyncRepository(
 
     private fun someRefreshTaskHasFinished() {
         refreshTasksActive--
+
+        if (refreshTasksActive == 0) {
+            EventBus.getDefault().post(SyncFinishedEvent())
+        }
     }
 
     private fun downloadFiles() {
@@ -219,3 +226,6 @@ class SyncRepository(
         EventBus.getDefault().post(SavedUserEvent(storeUser))
     }
 }
+
+class SyncStartedEvent
+class SyncFinishedEvent

@@ -44,6 +44,11 @@ class UserRepository(
         return true
     }
 
+    fun logout() {
+        settingService.clearAuthenticationToken()
+        authenticationService.clearAuthenticationToken()
+    }
+
     fun login(email: String, password: String) {
         val domainOverrider = domainService.getDomainOverrider(domainServiceRepository.domainOverrides, email)
 

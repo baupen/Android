@@ -12,6 +12,15 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.startActivity
+import android.view.Menu
+import android.view.MenuItem
+import androidx.core.view.iterator
+import io.mangel.issuemanager.activities.login.LoginActivity
+import io.mangel.issuemanager.repositories.SyncFinishedEvent
+import io.mangel.issuemanager.repositories.SyncStartedEvent
+import org.jetbrains.anko.clearTop
+import org.jetbrains.anko.intentFor
+
 
 class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     override fun setAbnahmeModusActive(value: Boolean) {
@@ -20,6 +29,24 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
 
     override fun navigate(constructionSite: ConstructionSite) {
         startActivity<NavigationActivity>(NavigationActivity.ARGUMENTS_CONSTRUCTION_SITE_ID to constructionSite.id)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.overview, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.logout -> {
+                getApplicationFactory().userRepository.logout()
+                startActivity(intentFor<LoginActivity>().clearTop())
+            }
+            R.id.refresh -> getApplicationFactory().syncRepository.sync()
+        }
+
+        return true
     }
 
     private var overviewViewModel: OverviewViewModel<OverviewActivity>? = null
@@ -35,13 +62,44 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
 
         overviewViewModel = OverviewViewModel(this, contentView!!, payload)
 
-        getApplicationFactory().syncRepository.refresh()
+        getApplicationFactory().syncRepository.sync()
+    }
+
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val alpha = if (syncActive) {
+            130
+        } else {
+            255
+        }
+
+        for (entry in menu.iterator()) {
+            entry.isEnabled = !syncActive
+            entry.icon.alpha = alpha
+        }
+
+        return true
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: LoadedConstructionSitesEvent) {
         overviewViewModel?.onConstructionSitesChanged()
+    }
+
+    private var syncActive = false
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun on(event: SyncStartedEvent) {
+        syncActive = true
+        invalidateOptionsMenu()
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun on(event: SyncFinishedEvent) {
+        syncActive = false
+        invalidateOptionsMenu()
     }
 
     @Suppress("unused")

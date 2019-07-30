@@ -16,6 +16,10 @@ class SettingService(
         return read(SettingKey.User, User::class.java)
     }
 
+    fun clearAuthenticationToken() {
+        clear(SettingKey.AuthenticationToken)
+    }
+
     fun saveAuthenticationToken(authenticationToken: AuthenticationToken) {
         save(SettingKey.AuthenticationToken, authenticationToken)
     }
@@ -27,6 +31,10 @@ class SettingService(
     private fun save(key: SettingKey, element: Any) {
         val json = serializationService.serialize(element)
         preferences.edit().putString(key.value, json).apply()
+    }
+
+    private fun clear(key: SettingKey) {
+        preferences.edit().remove(key.value).apply()
     }
 
     private fun <T> read(key: SettingKey, classOfT: Class<T>): T? {

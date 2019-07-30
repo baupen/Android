@@ -16,8 +16,8 @@ abstract class AbstractLoadingViewModel : LoadingService.LoadingIndicator {
         getLoadingIndicator().isIndeterminate = false
         showProgressIndicator()
 
-        getLoadingIndicator().progress = progress
         getLoadingIndicator().max = max
+        getLoadingIndicator().progress = progress
     }
 
     override fun hideProgressIndicator() {

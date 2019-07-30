@@ -10,7 +10,7 @@ import org.greenrobot.eventbus.EventBus
 
 class AuthenticationService(private val sqliteService: SqliteService) {
     fun clearUserData() {
-        // files will be cleaned up automatically after the next refresh tasks finished
+        // files will be cleaned up automatically after the next sync tasks finished
         sqliteService.clearDatabase()
 
         EventBus.getDefault().post(SavedConstructionSitesEvent())
@@ -22,6 +22,10 @@ class AuthenticationService(private val sqliteService: SqliteService) {
     private var _authenticationToken: AuthenticationToken? = null
     fun setAuthenticationToken(authenticationToken: AuthenticationToken) {
         _authenticationToken = authenticationToken;
+    }
+
+    fun clearAuthenticationToken() {
+        _authenticationToken = null;
     }
 
     fun getAuthenticationToken(): AuthenticationToken {

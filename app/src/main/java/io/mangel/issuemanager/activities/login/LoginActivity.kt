@@ -50,7 +50,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     }
 
     private fun navigateToOverview() {
-        startActivity<OverviewActivity>()
+        startActivity(intentFor<OverviewActivity>().clearTop())
     }
 
     override fun login(email: String, password: String) {

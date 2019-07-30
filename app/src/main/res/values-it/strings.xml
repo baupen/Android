@@ -32,4 +32,6 @@
     </string>
     <string name="please_login">Bitte einloggen</string>
     <string name="login_with_email">Benutzen Sie Ihre Geschäftsmail.</string>
+    <string name="refresh">aktualisieren</string>
+    <string name="logout">ausloggen</string>
 </resources>
