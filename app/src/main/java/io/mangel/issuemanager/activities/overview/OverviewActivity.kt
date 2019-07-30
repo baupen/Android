@@ -12,8 +12,8 @@ import org.jetbrains.anko.contentView
 import org.jetbrains.anko.startActivity
 
 class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
-    override fun setAbnahmeModus(value: Boolean) {
-        getApplicationFactory().userRepository
+    override fun setAbnahmeModusActive(value: Boolean) {
+        getApplicationFactory().issueRepository.isAbnahmeModusActive = value
     }
 
     override fun navigate(constructionSite: ConstructionSite) {
@@ -34,8 +34,9 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
         }
 
         val constructionSites = getApplicationFactory().constructionSiteRepository.getConstructionSites()
+        val isAbnahmeModusActive = getApplicationFactory().issueRepository.isAbnahmeModusActive
+        val payload = OverviewViewModel.Payload(getApplicationFactory(), constructionSites, isAbnahmeModusActive)
 
-        val payload = OverviewViewModel.Payload(getApplicationFactory(), constructionSites)
         overviewViewModel = OverviewViewModel(this, contentView!!, payload)
     }
 

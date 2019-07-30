@@ -12,23 +12,18 @@ class Address(
             lines.add(streetAddress)
         }
 
-        var localityLine = ""
+        val localityLineEntries = ArrayList<String>()
         if (postalCode != null) {
-            localityLine += postalCode
+            localityLineEntries.add(postalCode)
         }
         if (locality != null) {
-            if (localityLine != "") {
-                localityLine += " "
-            }
-            localityLine += locality
+            localityLineEntries.add(locality)
         }
-
-        if (localityLine != "") {
-            lines.add(localityLine)
-        }
-
         if (country != null) {
-            lines.add(country)
+            localityLineEntries.add(country)
+        }
+        if (localityLineEntries.isNotEmpty()) {
+            lines.add(localityLineEntries.joinToString(separator = " "))
         }
 
         return lines.joinToString(separator = "\n")

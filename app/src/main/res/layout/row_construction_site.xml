@@ -6,10 +6,10 @@
         android:layout_gravity="center"
         android:layout_width="300sp"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/card_spacing"
-        android:paddingRight="@dimen/card_spacing"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
+        android:paddingLeft="@dimen/recycler_flow_item_margin"
+        android:paddingRight="@dimen/recycler_flow_item_margin"
+        android:paddingTop="@dimen/recycler_noflow_item_margin"
+        android:paddingBottom="@dimen/recycler_noflow_item_margin"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:clickable="true"
@@ -23,7 +23,8 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="?android:attr/selectableItemBackground">
 
             <ImageView
                     android:id="@+id/image"

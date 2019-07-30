@@ -5,16 +5,19 @@ import io.mangel.issuemanager.R
 import io.mangel.issuemanager.activities.AbstractActivity
 import io.mangel.issuemanager.activities.overview.OverviewActivity
 import io.mangel.issuemanager.api.Error
+import io.mangel.issuemanager.api.tasks.CreateTrialAccountTaskFinished
 import io.mangel.issuemanager.api.tasks.DomainOverridesTaskFailed
 import io.mangel.issuemanager.api.tasks.LoginTaskFailed
 import io.mangel.issuemanager.api.tasks.LoginTaskFinished
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.contentView
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.*
 
 class LoginActivity : AbstractActivity(), LoginViewModel.Login {
+    override fun createTrialAccount() {
+        getApplicationFactory().userRepository.createTrialAccount()
+    }
+
     private lateinit var loginViewModel: LoginViewModel<LoginActivity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +59,20 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
             Error.WrongPassword -> longToast(R.string.password_wrong)
             else -> getApplicationFactory().notificationService.showApiError(loginTaskFailed.error)
         }
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onCreateTrialAccountTaskFinished(event: CreateTrialAccountTaskFinished) {
+        alert(
+            getString(R.string.trial_account_help, event.trialUser.username, event.trialUser.password),
+            getString(R.string.trial_account_created)
+        ) {
+            yesButton {
+                loginViewModel.setUsernamePassword(event.trialUser.username, event.trialUser.password)
+                toast("Email & Passwort des Probeaccounts wurden eingefüllt")
+            }
+        }.show()
     }
 
     @Suppress("unused")

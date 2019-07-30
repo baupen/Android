@@ -1,7 +1,12 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="card_spacing">6sp</dimen>
-    <dimen name="text_margin">6sp</dimen>
+    <dimen name="activity_margin">16dp</dimen>
+
+    <dimen name="recycler_noflow_item_margin">4sp</dimen>
+    <dimen name="recycler_noflow_margin">0sp</dimen>
+    <dimen name="recycler_flow_item_margin">4sp</dimen>
+    <dimen name="recycler_flow_margin">12sp</dimen>
+
+    <dimen name="text_margin">8sp</dimen>
+    <dimen name="section_end">16sp</dimen>
+    <dimen name="activity_margin_negative">-16dp</dimen>
 </resources>

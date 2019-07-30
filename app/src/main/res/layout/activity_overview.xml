@@ -1,58 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         tools:context=".activities.overview.OverviewActivity">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeContainer"
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/activity_margin"
+            android:paddingRight="@dimen/activity_margin"
+            android:layout_marginBottom="@dimen/section_end">
 
-        <LinearLayout
+        <ProgressBar
+                android:id="@+id/loading"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:minHeight="2dp"
+                android:maxHeight="2dp"
+                android:progressTint="@color/colorPrimary"
+                android:progressBackgroundTint="@android:color/white"
+                android:indeterminateTintMode="src_atop"
+                android:foregroundTint="@color/colorPrimaryDark"
+                tools:visibility="visible"
+                tools:progress="50"
+                tools:minHeight="4sp"
+                tools:maxHeight="4sp"/>
 
-            <ProgressBar
-                    android:id="@+id/loading"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="2dp"
-                    android:maxHeight="2dp"
-                    android:progressTint="@color/colorPrimary"
-                    android:progressBackgroundTint="@android:color/white"
-                    android:indeterminateTintMode="src_atop"
-                    android:foregroundTint="@color/colorPrimaryDark"
-                    tools:visibility="visible"/>
+        <TextView
+                android:id="@+id/welcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/text_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                tools:text="Willkommen, Florian"/>
+
+    </LinearLayout>
+
+    <io.mangel.issuemanager.views.SaveScrollRecyclerView
+            android:id="@+id/construction_sites"
+            android:name="ch.famoser.mensa.ItemListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".activities.MainActivity"
+            tools:listitem="@layout/row_construction_site"
+            android:paddingStart="@dimen/recycler_flow_margin"
+            android:paddingEnd="@dimen/recycler_flow_margin"
+            android:paddingTop="@dimen/recycler_noflow_margin"
+            android:paddingBottom="@dimen/recycler_noflow_margin"
+            android:clipToPadding="false"
+            tools:itemCount="3"
+            android:layout_marginBottom="@dimen/section_end"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_margin">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/text_margin">
 
             <TextView
-                    android:id="@+id/welcome"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/text_margin"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    tools:text="Willkommen, Florian"/>
+                    android:text="@string/abnahmemodus"
+                    style="@style/TextAppearance.AppCompat.Title"
+                    tools:ignore="RelativeOverlap"/>
 
-            <io.mangel.issuemanager.views.SaveScrollRecyclerView
-                    android:id="@+id/construction_sites"
-                    android:name="ch.famoser.mensa.ItemListFragment"
-                    android:layout_width="match_parent"
+            <Switch
+                    android:id="@+id/abnahmemodus_switch"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="LinearLayoutManager"
-                    tools:context=".activities.MainActivity"
-                    tools:listitem="@layout/row_construction_site"
-                    tools:itemCount="3"/>
+                    android:layout_alignParentEnd="true"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/abnahmemodus_description"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</LinearLayout>

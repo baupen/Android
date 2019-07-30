@@ -40,11 +40,22 @@ class ConstructionSiteAdapter(
 
         if (constructionSite.imagePath != null && fileService.exists(constructionSite.imagePath)) {
             val imageBytes = fileService.read(constructionSite.imagePath)
+            setImageHeight(holder.imageView)
             holder.imageView.setImageURI(imageBytes.toUri())
         }
 
         holder.itemView.setOnClickListener {
             overview.navigate(constructionSite)
+        }
+    }
+
+    private fun setImageHeight(imageView: ImageView) {
+        val width = _width
+        if (width != null) {
+            val height = (width * 0.5).toInt()
+
+            imageView.minimumHeight = height
+            imageView.maxHeight = height
         }
     }
 

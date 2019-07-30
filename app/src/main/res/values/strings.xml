@@ -17,4 +17,16 @@
     <string name="no_internet_access">Eine Verbindung mit dem Internet ist nicht möglich.</string>
     <string name="welcome">Willkommen, %s!</string>
     <string name="construction_site">Baustelle</string>
+    <string name="abnahmemodus">Abnahmemodus</string>
+    <string name="abnahmemodus_description">Im Abnahmemodus werden nur die Pendenzen angezeigt, die auch im Abnahmemodus
+        erfasst wurden.
+    </string>
+    <string name="action_create_trial_account">Probekonto erstellen</string>
+    <string name="or">oder</string>
+    <string name="trial_account_created">Ihr Probeaccount wurde erstellt."</string>
+    <string name="trial_account_help">Besuchen Sie uns unter www.app.mangel.io um die in der App erfassen Pendenzen weiter zu verwalten. \n\n
+        Dazu brauchen Sie die folgenden Zugangsdaten: \n
+        Benutzername: %s\n
+        Passwort: %s
+    </string>
 </resources>

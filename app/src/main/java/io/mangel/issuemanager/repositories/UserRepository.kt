@@ -59,8 +59,8 @@ class UserRepository(
         loginTask.execute(loginRequest)
     }
 
-    fun createTrialAccount(proposedGivenName: String, proposedFamilyName: String) {
-        val loginRequest = CreateTrialAccountRequest(proposedGivenName, proposedFamilyName)
+    fun createTrialAccount() {
+        val loginRequest = CreateTrialAccountRequest()
 
         val client = clientFactory.getClient(TRIAL_ACCOUNT_HOST)
         val trialAccountTask = CreateTrialAccountTask(client)
