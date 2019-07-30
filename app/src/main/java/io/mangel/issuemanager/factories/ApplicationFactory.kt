@@ -2,10 +2,7 @@ package io.mangel.issuemanager.factories
 
 import android.content.Context
 import io.mangel.issuemanager.models.ModelConverter
-import io.mangel.issuemanager.repositories.ConstructionSiteRepository
-import io.mangel.issuemanager.repositories.DomainOverridesRepository
-import io.mangel.issuemanager.repositories.SyncRepository
-import io.mangel.issuemanager.repositories.UserRepository
+import io.mangel.issuemanager.repositories.*
 import io.mangel.issuemanager.services.*
 import io.mangel.issuemanager.services.SettingService
 import io.mangel.issuemanager.services.data.*
@@ -65,6 +62,12 @@ public class ApplicationFactory(context: Context) {
         constructionSiteDataService,
         modelConverter
     )
+
+    val mapRepository = MapRepository()
+
+    val issueRepository = IssueRepository()
+
+    val craftsmanRepository = CraftsmanRepository()
 
     val syncRepository = SyncRepository(
         storeConverter,

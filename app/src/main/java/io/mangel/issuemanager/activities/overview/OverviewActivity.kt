@@ -3,19 +3,21 @@ package io.mangel.issuemanager.activities.overview
 import android.os.Bundle
 import io.mangel.issuemanager.R
 import io.mangel.issuemanager.activities.AbstractActivity
+import io.mangel.issuemanager.activities.navigation.NavigationActivity
 import io.mangel.issuemanager.models.ConstructionSite
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.repositories.ConstructionSitesLoaded
 import kotlinx.android.synthetic.main.activity_overview.*
 import org.jetbrains.anko.contentView
+import org.jetbrains.anko.startActivity
 
 class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     override fun setAbnahmeModus(value: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        getApplicationFactory().userRepository
     }
 
     override fun navigate(constructionSite: ConstructionSite) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startActivity<NavigationActivity>(NavigationActivity.ARGUMENTS_CONSTRUCTION_SITE_ID to constructionSite.id)
     }
 
     private var overviewViewModel: OverviewViewModel<OverviewActivity>? = null
@@ -40,6 +42,7 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     @Suppress("unused")
     fun onConstructionSitesLoaded(event: ConstructionSitesLoaded) {
         overviewViewModel?.refreshConstructionSites()
+        getApplicationFactory().syncRepository.refresh()
     }
 
     private fun initializeView(user: User) {
