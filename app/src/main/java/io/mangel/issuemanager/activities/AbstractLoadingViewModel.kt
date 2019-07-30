@@ -8,23 +8,23 @@ abstract class AbstractLoadingViewModel : LoadingService.LoadingIndicator {
     protected abstract fun getLoadingIndicator() : ProgressBar
 
     override fun showIndeterminateProgress() {
-        show()
+        showProgressIndicator()
         getLoadingIndicator().isIndeterminate = true
     }
 
     override fun showDeterminateProgress(progress: Int, max: Int) {
         getLoadingIndicator().isIndeterminate = false
-        show()
+        showProgressIndicator()
 
         getLoadingIndicator().progress = progress
         getLoadingIndicator().max = max
     }
 
-    override fun hide() {
+    override fun hideProgressIndicator() {
         getLoadingIndicator().visibility = View.GONE
     }
 
-    open fun show() {
+    open fun showProgressIndicator() {
         getLoadingIndicator().visibility = View.VISIBLE
     }
 }

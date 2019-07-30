@@ -46,6 +46,8 @@ public class ApplicationFactory(context: Context) {
     private val issueDataService = IssueDataService(sqliteService)
     private val craftsmanDataService = CraftsmanDataService(sqliteService)
 
+    private val authenticationService = AuthenticationService(sqliteService)
+
 
     val domainRepository = DomainOverridesRepository(clientFactory)
 
@@ -55,7 +57,8 @@ public class ApplicationFactory(context: Context) {
         storeConverter,
         modelConverter,
         settingService,
-        clientFactory
+        clientFactory,
+        authenticationService
     )
 
     val constructionSiteRepository = ConstructionSiteRepository(
@@ -78,6 +81,7 @@ public class ApplicationFactory(context: Context) {
         craftsmanDataService,
         fileService,
         settingService,
-        clientFactory
+        clientFactory,
+        authenticationService
     )
 }

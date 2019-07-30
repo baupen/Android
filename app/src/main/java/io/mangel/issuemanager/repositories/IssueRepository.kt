@@ -1,7 +1,6 @@
 package io.mangel.issuemanager.repositories
 
-import io.mangel.issuemanager.repositories.base.AuthenticatedRepository
 
-class IssueRepository : AuthenticatedRepository() {
+class IssueRepository {
     var isAbnahmeModusActive = false
 }

@@ -1,12 +1,9 @@
 package io.mangel.issuemanager.repositories
 
-import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.DomainOverride
 import io.mangel.issuemanager.api.tasks.DomainOverridesTask
 import io.mangel.issuemanager.api.tasks.DomainOverridesTaskFinished
 import io.mangel.issuemanager.factories.ClientFactory
-import io.mangel.issuemanager.services.RestHttpService
-import io.mangel.issuemanager.services.SerializationService
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode

@@ -36,6 +36,19 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        loginViewModel.resetState()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+
+        loginViewModel.resetState()
+    }
+
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onDomainOverridesTaskFailed(domainOverridesTaskFailed: DomainOverridesTaskFailed) {
@@ -47,8 +60,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     }
 
     override fun login(email: String, password: String) {
-        val repository = getApplicationFactory().userRepository
-        repository.login(email, password)
+        getApplicationFactory().userRepository.login(email, password)
     }
 
     @Suppress("unused")
@@ -76,8 +88,9 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     }
 
     @Suppress("unused")
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
     fun onLoginTaskFinished(loginTaskFinished: LoginTaskFinished) {
+        loginViewModel.showLoginSuccessful(loginTaskFinished.user.givenName)
         navigateToOverview()
     }
 }

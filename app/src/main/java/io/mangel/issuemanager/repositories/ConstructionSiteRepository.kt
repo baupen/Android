@@ -2,17 +2,13 @@ package io.mangel.issuemanager.repositories
 
 import io.mangel.issuemanager.models.ConstructionSite
 import io.mangel.issuemanager.models.ModelConverter
-import io.mangel.issuemanager.repositories.base.AuthenticatedRepository
-import io.mangel.issuemanager.services.DomainService
-import io.mangel.issuemanager.services.RestHttpService
 import io.mangel.issuemanager.services.data.ConstructionSiteDataService
-import org.greenrobot.eventbus.EventBus
 
 
 class ConstructionSiteRepository(
     private val constructionSiteDataService: ConstructionSiteDataService,
     private val modelConverter: ModelConverter
-) : AuthenticatedRepository() {
+) {
     private val _constructionSites = ArrayList<ConstructionSite>()
     private val _constructionSiteById = HashMap<String, ConstructionSite>()
 
@@ -38,9 +34,5 @@ class ConstructionSiteRepository(
             _constructionSiteById[constructionSite.id] = model
             _constructionSites.add(model)
         }
-
-        EventBus.getDefault().post(ConstructionSitesLoaded())
     }
 }
-
-class ConstructionSitesLoaded

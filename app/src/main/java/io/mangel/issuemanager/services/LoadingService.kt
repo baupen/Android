@@ -35,7 +35,7 @@ class LoadingService(private val loadingIndicator: LoadingIndicator) {
             progressByTask = HashMap();
             maxByTask = HashMap();
 
-            loadingIndicator.hide()
+            loadingIndicator.hideProgressIndicator()
         } else {
             showDeterminateProgress()
         }
@@ -50,6 +50,6 @@ class LoadingService(private val loadingIndicator: LoadingIndicator) {
 
         fun showDeterminateProgress(progress: Int, max: Int)
 
-        fun hide()
+        fun hideProgressIndicator()
     }
 }

@@ -1,19 +1,14 @@
 package io.mangel.issuemanager.repositories
 
-import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.LoginRequest
 import io.mangel.issuemanager.api.CreateTrialAccountRequest
 import io.mangel.issuemanager.api.tasks.*
-import io.mangel.issuemanager.events.AuthenticationSuccessfulEvent
-import io.mangel.issuemanager.events.UserLoadedEvent
-import io.mangel.issuemanager.events.UserRefreshedEvent
+import io.mangel.issuemanager.events.UserSavedEvent
 import io.mangel.issuemanager.factories.ClientFactory
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.*
 import io.mangel.issuemanager.services.SettingService
-import io.mangel.issuemanager.services.data.SqliteService
-import io.mangel.issuemanager.store.AuthenticationToken
 import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -28,7 +23,8 @@ class UserRepository(
     private val storeConverter: StoreConverter,
     private val modelConverter: ModelConverter,
     private val settingService: SettingService,
-    private val clientFactory: ClientFactory
+    private val clientFactory: ClientFactory,
+    private val authenticationService: AuthenticationService
 ) {
     companion object {
         const val TRIAL_ACCOUNT_HOST = DomainOverridesRepository.DOMAIN_OVERRIDES_HOST
@@ -40,9 +36,7 @@ class UserRepository(
 
     fun tryAutomaticLogin(): Boolean {
         val token = settingService.readAuthenticationToken() ?: return false
-
-        val authenticationSuccessfulEvent = AuthenticationSuccessfulEvent(token)
-        EventBus.getDefault().post(authenticationSuccessfulEvent)
+        authenticationService.setAuthenticationToken(token)
 
         return true
     }
@@ -67,17 +61,16 @@ class UserRepository(
         trialAccountTask.execute(loginRequest)
     }
 
-    private var user: User? = null
-    private var authenticationToken: AuthenticationToken? = null
+    private var _user: User? = null
 
-    fun getLoggedInUser(): User? {
-        val authenticationToken = authenticationToken
-        if (user == null && authenticationToken != null) {
-            val storeUser = settingService.readUser() ?: return null
-            val user = modelConverter.convert(storeUser)
-            EventBus.getDefault().post(UserLoadedEvent(user))
+    fun getLoggedInUser(): User {
+        var user = _user
 
-            this.user = user
+        if (user == null) {
+            val storeUser = settingService.readUser() ?: throw IllegalAccessException("No user saved")
+            user = modelConverter.convert(storeUser)
+
+            this._user = user
         }
 
         return user
@@ -85,28 +78,27 @@ class UserRepository(
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onUserRefreshedEvent(event: UserRefreshedEvent) {
-        user = event.user
+    fun on(event: UserSavedEvent) {
+        _user = event.user
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onLoginTaskFinished(event: LoginTaskFinished) {
+        val previousUser = settingService.readUser()
+        if (previousUser != null && previousUser.id != event.user.meta.id) {
+            authenticationService.clearUserData()
+        }
+
         val storeUser = storeConverter.convert(event.user)
+
         settingService.saveUser(storeUser)
 
-        user = modelConverter.convert(storeUser)
+        _user = modelConverter.convert(storeUser)
 
         val authenticationToken = storeConverter.getAuthenticationToken(event.host, event.user)
-        val authenticationTokenRefreshedEvent = AuthenticationSuccessfulEvent(authenticationToken)
-        EventBus.getDefault().post(authenticationTokenRefreshedEvent)
-    }
-
-    @Suppress("unused")
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onAuthenticationSuccessfulEvent(event: AuthenticationSuccessfulEvent) {
-        this.authenticationToken = event.authenticationToken
-        settingService.saveAuthenticationToken(event.authenticationToken)
+        authenticationService.setAuthenticationToken(authenticationToken)
+        settingService.saveAuthenticationToken(authenticationToken)
     }
 
     private fun getSHA256Hash(text: String): String {

@@ -10,6 +10,15 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
     private val db: IssueManagerDatabaseContext =
         IssueManagerDatabaseContext(metaProvider, context)
 
+    fun clearDatabase() {
+        db.use {
+            for (table in metaProvider.supported) {
+                val meta = metaProvider.getMeta(table)
+                execSQL("DELETE FROM ${meta.getTableName()}")
+            }
+        }
+    }
+
     fun <T : SqliteEntry> store(element: T) {
         val meta = metaProvider.getMeta(element.javaClass)
 

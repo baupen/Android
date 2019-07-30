@@ -52,13 +52,15 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         return viewHolder.loadingProgressBar
     }
 
-    override fun hide() {
-        super.hide()
-        viewHolder.loginWrapper.visibility = View.VISIBLE
+    override fun hideProgressIndicator() {
+        super.hideProgressIndicator()
+        if (showLoginAfterLoading) {
+            viewHolder.loginWrapper.visibility = View.VISIBLE
+        }
     }
 
-    override fun show() {
-        super.show()
+    override fun showProgressIndicator() {
+        super.showProgressIndicator()
         viewHolder.loginWrapper.visibility = View.GONE
     }
 
@@ -97,6 +99,23 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         checkCanSubmit()
     }
 
+    private var showLoginAfterLoading = true
+
+    fun showLoginSuccessful(givenName: String) {
+        viewHolder.loginWrapper.visibility = View.GONE
+        viewHolder.welcomeWrapper.visibility = View.VISIBLE
+        viewHolder.welcomeTextView.text = context.getString(R.string.welcome, givenName);
+
+        showLoginAfterLoading = false
+    }
+
+    fun resetState() {
+        viewHolder.welcomeWrapper.visibility = View.GONE
+        viewHolder.loginWrapper.visibility = View.VISIBLE
+
+        showLoginAfterLoading = true
+    }
+
     class ViewHolder(view: View) {
         val usernameExitText: EditText = view.username
         val passwordEditText: EditText = view.password
@@ -104,5 +123,7 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         val createTrialAccountButton: Button = view.create_trial_account
         val loadingProgressBar: ProgressBar = view.loading
         val loginWrapper: View = view.login_wrapper
+        val welcomeWrapper: View = view.welcome_wrapper
+        val welcomeTextView: TextView = view.welcome
     }
 }

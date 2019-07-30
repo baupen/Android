@@ -1,6 +1,5 @@
 package io.mangel.issuemanager.repositories
 
-import io.mangel.issuemanager.api.Client
 import io.mangel.issuemanager.api.FileDownloadRequest
 import io.mangel.issuemanager.api.ObjectMeta
 import io.mangel.issuemanager.api.ReadRequest
@@ -8,14 +7,14 @@ import io.mangel.issuemanager.api.tasks.*
 import io.mangel.issuemanager.events.*
 import io.mangel.issuemanager.factories.ClientFactory
 import io.mangel.issuemanager.models.ModelConverter
-import io.mangel.issuemanager.models.User
-import io.mangel.issuemanager.repositories.base.AuthenticatedRepository
+import io.mangel.issuemanager.services.AuthenticationService
 import io.mangel.issuemanager.services.FileService
-import io.mangel.issuemanager.services.RestHttpService
-import io.mangel.issuemanager.services.SerializationService
 import io.mangel.issuemanager.services.SettingService
-import io.mangel.issuemanager.services.data.*
-import io.mangel.issuemanager.store.*
+import io.mangel.issuemanager.services.data.ConstructionSiteDataService
+import io.mangel.issuemanager.services.data.CraftsmanDataService
+import io.mangel.issuemanager.services.data.IssueDataService
+import io.mangel.issuemanager.services.data.MapDataService
+import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -29,8 +28,9 @@ class SyncRepository(
     private val craftsmanDataService: CraftsmanDataService,
     private val fileService: FileService,
     private val settingService: SettingService,
-    private val clientFactory: ClientFactory
-) : AuthenticatedRepository() {
+    private val clientFactory: ClientFactory,
+    private val authenticationService: AuthenticationService
+) {
 
     private var refreshTasksActive = 0
 
@@ -43,7 +43,7 @@ class SyncRepository(
             refreshTasksActive = 1
         }
 
-        val authToken = getAuthenticationToken() ?: return
+        val authToken = authenticationService.getAuthenticationToken()
         val user = settingService.readUser() ?: return
 
         val userMeta = ObjectMeta(user.id, user.lastChangeTime)
@@ -73,7 +73,7 @@ class SyncRepository(
         }
 
         processChangedAndDeletedElements(event)
-        EventBus.getDefault().post(ElementsRefreshedEvent())
+        EventBus.getDefault().post(ConstructionSitesSavedEvent())
 
         downloadFiles()
 
@@ -99,7 +99,7 @@ class SyncRepository(
     }
 
     private fun downloadFiles() {
-        val authToken = getAuthenticationToken() ?: return
+        val authToken = authenticationService.getAuthenticationToken()
         val fileDownloadTasks = ArrayList<FileDownloadTaskEntry>()
 
         val constructionSiteImages = constructionSiteDataService.getConstructionSiteImages()
@@ -156,21 +156,33 @@ class SyncRepository(
         val storeConstructionSites = event.changedConstructionSites.map { cs -> storeConverter.convert(cs) }
         constructionSiteDataService.store(storeConstructionSites)
         constructionSiteDataService.delete(event.removedConstructionSiteIDs)
+        if (storeConstructionSites.isNotEmpty() || event.removedConstructionSiteIDs.isNotEmpty()) {
+            EventBus.getDefault().post(ConstructionSitesSavedEvent())
+        }
 
         // process craftsman
         val storeCraftsmen = event.changedCraftsmen.map { cs -> storeConverter.convert(cs) }
         craftsmanDataService.store(storeCraftsmen)
         craftsmanDataService.delete(event.removedCraftsmanIDs)
+        if (storeCraftsmen.isNotEmpty() || event.removedCraftsmanIDs.isNotEmpty()) {
+            EventBus.getDefault().post(CraftsmanSavedEvent())
+        }
 
         // process maps
         val storeMaps = event.changedMaps.map { cs -> storeConverter.convert(cs) }
         mapDataService.store(storeMaps)
         mapDataService.delete(event.removedMapIDs)
+        if (storeMaps.isNotEmpty() || event.removedMapIDs.isNotEmpty()) {
+            EventBus.getDefault().post(MapsSavedEvent())
+        }
 
         // process issues
         val storeIssues = event.changedIssues.map { cs -> storeConverter.convert(cs) }
         issueDataService.store(storeIssues)
         issueDataService.delete(event.removedIssueIDs)
+        if (storeIssues.isNotEmpty() || event.removedIssueIDs.isNotEmpty()) {
+            EventBus.getDefault().post(IssuesSavedEvent())
+        }
     }
 
     private fun refreshUser(apiUser: io.mangel.issuemanager.api.User) {
@@ -178,16 +190,6 @@ class SyncRepository(
         settingService.saveUser(storeUser)
 
         val user = modelConverter.convert(storeUser)
-        _user = user
-        EventBus.getDefault().post(UserRefreshedEvent(user))
-    }
-
-
-    private var _user: User? = null
-
-    @Suppress("unused")
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onUserLoaded(event: UserLoadedEvent) {
-        _user = event.user
+        EventBus.getDefault().post(UserSavedEvent(user))
     }
 }
