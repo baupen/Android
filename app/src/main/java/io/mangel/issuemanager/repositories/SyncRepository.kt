@@ -13,7 +13,7 @@ import io.mangel.issuemanager.services.data.ConstructionSiteDataService
 import io.mangel.issuemanager.services.data.CraftsmanDataService
 import io.mangel.issuemanager.services.data.IssueDataService
 import io.mangel.issuemanager.services.data.MapDataService
-import io.mangel.issuemanager.store.StoreConverter
+import io.mangel.issuemanager.services.data.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode

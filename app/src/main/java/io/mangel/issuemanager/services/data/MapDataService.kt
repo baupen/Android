@@ -1,7 +1,7 @@
 package io.mangel.issuemanager.services.data
 
 import io.mangel.issuemanager.api.ObjectMeta
-import io.mangel.issuemanager.store.Map
+import io.mangel.issuemanager.services.data.store.Map
 import org.jetbrains.anko.db.RowParser
 
 class MapDataService(private val sqliteService: SqliteService) : AbstractDataService<Map>(sqliteService) {

@@ -1,6 +1,6 @@
 package io.mangel.issuemanager.events
 
-import io.mangel.issuemanager.store.User
+import io.mangel.issuemanager.services.data.store.User
 
 /**
  * Events issued if agents outside of the respective repository change the entity

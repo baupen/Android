@@ -10,7 +10,7 @@ import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.models.User
 import io.mangel.issuemanager.services.*
 import io.mangel.issuemanager.services.SettingService
-import io.mangel.issuemanager.store.StoreConverter
+import io.mangel.issuemanager.services.data.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -106,7 +106,7 @@ class UserRepository(
         setUser(storeUser)
     }
 
-    private fun setUser(storeUser: io.mangel.issuemanager.store.User): User {
+    private fun setUser(storeUser: io.mangel.issuemanager.services.data.store.User): User {
         val user = modelConverter.convert(storeUser)
         _user = user
 

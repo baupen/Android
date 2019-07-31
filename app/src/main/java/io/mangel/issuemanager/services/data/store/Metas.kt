@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.store
+package io.mangel.issuemanager.services.data.store
 
 import org.jetbrains.anko.db.*
 import java.lang.IllegalArgumentException

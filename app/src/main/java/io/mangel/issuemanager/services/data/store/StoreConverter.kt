@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.store
+package io.mangel.issuemanager.services.data.store
 
 import io.mangel.issuemanager.api.Craftsman
 import io.mangel.issuemanager.api.ConstructionSite
@@ -8,7 +8,7 @@ import io.mangel.issuemanager.api.User
 import io.mangel.issuemanager.api.File
 
 class StoreConverter {
-    fun convert(user: User): io.mangel.issuemanager.store.User {
+    fun convert(user: User): io.mangel.issuemanager.services.data.store.User {
         return User(user.meta.id, user.meta.lastChangeTime, user.givenName, user.familyName)
     }
 
@@ -16,7 +16,7 @@ class StoreConverter {
         return AuthenticationToken(host, user.authenticationToken, user.meta.id)
     }
 
-    fun convert(constructionSite: ConstructionSite): io.mangel.issuemanager.store.ConstructionSite {
+    fun convert(constructionSite: ConstructionSite): io.mangel.issuemanager.services.data.store.ConstructionSite {
         val value = if (constructionSite.address.postalCode != null) {
             constructionSite.address.postalCode.toString()
         } else {
@@ -36,7 +36,7 @@ class StoreConverter {
         )
     }
 
-    fun convert(map: Map): io.mangel.issuemanager.store.Map {
+    fun convert(map: Map): io.mangel.issuemanager.services.data.store.Map {
         return Map(
             map.meta.id,
             map.constructionSiteID,
@@ -47,7 +47,7 @@ class StoreConverter {
         )
     }
 
-    fun convert(issue: Issue): io.mangel.issuemanager.store.Issue {
+    fun convert(issue: Issue): io.mangel.issuemanager.services.data.store.Issue {
         return Issue(
             issue.meta.id,
             issue.map,
@@ -71,7 +71,7 @@ class StoreConverter {
         )
     }
 
-    fun convert(craftsman: Craftsman): io.mangel.issuemanager.store.Craftsman {
+    fun convert(craftsman: Craftsman): io.mangel.issuemanager.services.data.store.Craftsman {
         return Craftsman(
             craftsman.meta.id,
             craftsman.constructionSiteID,

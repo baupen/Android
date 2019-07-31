@@ -3,8 +3,8 @@ package io.mangel.issuemanager.services.data
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import io.mangel.issuemanager.api.ObjectMeta
-import io.mangel.issuemanager.store.MetaProvider
-import io.mangel.issuemanager.store.SqliteEntry
+import io.mangel.issuemanager.services.data.store.MetaProvider
+import io.mangel.issuemanager.services.data.store.SqliteEntry
 import org.jetbrains.anko.db.*
 
 class SqliteService(private val metaProvider: MetaProvider, context: Context) {

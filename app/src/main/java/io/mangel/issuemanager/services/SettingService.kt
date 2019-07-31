@@ -1,8 +1,8 @@
 package io.mangel.issuemanager.services
 
 import android.content.SharedPreferences
-import io.mangel.issuemanager.store.AuthenticationToken
-import io.mangel.issuemanager.store.User
+import io.mangel.issuemanager.services.data.store.AuthenticationToken
+import io.mangel.issuemanager.services.data.store.User
 
 class SettingService(
     private val preferences: SharedPreferences,

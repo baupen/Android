@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.store
+package io.mangel.issuemanager.services.data.store
 
 sealed class SqliteEntry(
     val id: String,

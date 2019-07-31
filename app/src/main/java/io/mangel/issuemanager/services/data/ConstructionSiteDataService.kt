@@ -1,7 +1,7 @@
 package io.mangel.issuemanager.services.data
 
 import io.mangel.issuemanager.api.ObjectMeta
-import io.mangel.issuemanager.store.ConstructionSite
+import io.mangel.issuemanager.services.data.store.ConstructionSite
 import org.jetbrains.anko.db.RowParser
 
 class ConstructionSiteDataService(private val sqliteService: SqliteService) :

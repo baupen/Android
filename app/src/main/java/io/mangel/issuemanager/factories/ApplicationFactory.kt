@@ -5,8 +5,8 @@ import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.repositories.*
 import io.mangel.issuemanager.services.*
 import io.mangel.issuemanager.services.data.*
-import io.mangel.issuemanager.store.MetaProvider
-import io.mangel.issuemanager.store.StoreConverter
+import io.mangel.issuemanager.services.data.store.MetaProvider
+import io.mangel.issuemanager.services.data.store.StoreConverter
 
 class ApplicationFactory(context: Context) {
     companion object {

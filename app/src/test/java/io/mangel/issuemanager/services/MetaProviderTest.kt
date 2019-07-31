@@ -1,8 +1,8 @@
 package io.mangel.issuemanager.services
 
 import com.google.common.truth.Truth.assertThat
-import io.mangel.issuemanager.store.MetaProvider
-import io.mangel.issuemanager.store.SqliteEntry
+import io.mangel.issuemanager.services.data.store.MetaProvider
+import io.mangel.issuemanager.services.data.store.SqliteEntry
 import org.junit.Test
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass

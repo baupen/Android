@@ -1,7 +1,7 @@
 package io.mangel.issuemanager.services.data
 
 import io.mangel.issuemanager.api.ObjectMeta
-import io.mangel.issuemanager.store.SqliteEntry
+import io.mangel.issuemanager.services.data.store.SqliteEntry
 
 abstract class AbstractDataService<T : SqliteEntry>(private val sqliteService: SqliteService) {
     fun getAll(): List<T> {

@@ -5,7 +5,7 @@ import io.mangel.issuemanager.events.SavedCraftsmenEvent
 import io.mangel.issuemanager.events.SavedIssuesEvent
 import io.mangel.issuemanager.events.SavedMapsEvent
 import io.mangel.issuemanager.services.data.SqliteService
-import io.mangel.issuemanager.store.AuthenticationToken
+import io.mangel.issuemanager.services.data.store.AuthenticationToken
 import org.greenrobot.eventbus.EventBus
 
 class AuthenticationService(private val sqliteService: SqliteService) {

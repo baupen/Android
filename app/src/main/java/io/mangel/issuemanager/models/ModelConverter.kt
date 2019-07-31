@@ -1,9 +1,9 @@
 package io.mangel.issuemanager.models
 
-import io.mangel.issuemanager.store.ConstructionSite
-import io.mangel.issuemanager.store.Issue
-import io.mangel.issuemanager.store.Map
-import io.mangel.issuemanager.store.User
+import io.mangel.issuemanager.services.data.store.ConstructionSite
+import io.mangel.issuemanager.services.data.store.Issue
+import io.mangel.issuemanager.services.data.store.Map
+import io.mangel.issuemanager.services.data.store.User
 import org.threeten.bp.LocalDateTime
 
 class ModelConverter {
