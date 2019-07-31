@@ -54,13 +54,15 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
 
     override fun hideProgressIndicator() {
         super.hideProgressIndicator()
-        if (showLoginAfterLoading) {
+        if (showOnlyWelcomeView) {
             viewHolder.loginWrapper.visibility = View.VISIBLE
         }
     }
 
     override fun showProgressIndicator() {
-        super.showProgressIndicator()
+        if (showOnlyWelcomeView) {
+            super.showProgressIndicator()
+        }
         viewHolder.loginWrapper.visibility = View.GONE
     }
 
@@ -99,21 +101,14 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
         checkCanSubmit()
     }
 
-    private var showLoginAfterLoading = true
+    private var showOnlyWelcomeView = true
 
     fun showLoginSuccessful(givenName: String) {
         viewHolder.loginWrapper.visibility = View.GONE
         viewHolder.welcomeWrapper.visibility = View.VISIBLE
         viewHolder.welcomeTextView.text = context.getString(R.string.welcome, givenName);
 
-        showLoginAfterLoading = false
-    }
-
-    fun resetState() {
-        viewHolder.welcomeWrapper.visibility = View.GONE
-        viewHolder.loginWrapper.visibility = View.VISIBLE
-
-        showLoginAfterLoading = true
+        showOnlyWelcomeView = false
     }
 
     class ViewHolder(view: View) {

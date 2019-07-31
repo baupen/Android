@@ -20,34 +20,7 @@ import org.jetbrains.anko.*
 
 
 class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
-    override fun setAbnahmeModusActive(value: Boolean) {
-        getApplicationFactory().issueRepository.isAbnahmeModusActive = value
-    }
-
-    override fun navigate(constructionSite: ConstructionSite) {
-        startActivity<NavigationActivity>(NavigationActivity.ARGUMENTS_CONSTRUCTION_SITE_ID to constructionSite.id)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.overview, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.logout -> {
-                getApplicationFactory().userRepository.logout()
-                startActivity(intentFor<LoginActivity>().clearTop().noHistory())
-                finish()
-            }
-            R.id.refresh -> getApplicationFactory().syncRepository.sync()
-        }
-
-        return true
-    }
-
-    private var overviewViewModel: OverviewViewModel<OverviewActivity>? = null
+    private var _overviewViewModel: OverviewViewModel<OverviewActivity>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +31,17 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
         val isAbnahmeModusActive = getApplicationFactory().issueRepository.isAbnahmeModusActive
         val payload = OverviewViewModel.Payload(getApplicationFactory(), user, constructionSites, isAbnahmeModusActive)
 
-        overviewViewModel = OverviewViewModel(this, contentView!!, payload)
+        val overviewViewModel = OverviewViewModel(this, contentView!!, payload)
+        setLoadingViewModel(overviewViewModel)
+        _overviewViewModel = overviewViewModel
 
         getApplicationFactory().syncRepository.sync()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.overview, menu)
+        return true
     }
 
 
@@ -79,10 +60,31 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.logout -> {
+                getApplicationFactory().userRepository.logout()
+                startActivity(intentFor<LoginActivity>().clearTop().noHistory())
+                finish()
+            }
+            R.id.refresh -> getApplicationFactory().syncRepository.sync()
+        }
+
+        return true
+    }
+
+    override fun setAbnahmeModusActive(value: Boolean) {
+        getApplicationFactory().issueRepository.isAbnahmeModusActive = value
+    }
+
+    override fun navigate(constructionSite: ConstructionSite) {
+        startActivity<NavigationActivity>(NavigationActivity.ARGUMENTS_CONSTRUCTION_SITE_ID to constructionSite.id)
+    }
+
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: LoadedConstructionSitesEvent) {
-        overviewViewModel?.onConstructionSitesChanged()
+        _overviewViewModel?.onConstructionSitesChanged()
     }
 
     private var syncActive = false
@@ -99,18 +101,22 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
         syncActive = false
         invalidateOptionsMenu()
 
-        toast(getString(R.string.sync_finished))
+        if (event.result == false) {
+            toast(getString(R.string.sync_failed))
+        } else {
+            toast(getString(R.string.sync_finished))
+        }
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: LoadedUserEvent) {
-        overviewViewModel?.onUserChanged()
+        _overviewViewModel?.onUserChanged()
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: FileDownloadFinished) {
-        overviewViewModel?.onFileDownloaded(event.fileName)
+        _overviewViewModel?.onFileDownloaded(event.fileName)
     }
 }

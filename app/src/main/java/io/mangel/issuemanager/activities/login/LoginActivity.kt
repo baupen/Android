@@ -18,7 +18,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
         getApplicationFactory().userRepository.createTrialAccount()
     }
 
-    private lateinit var loginViewModel: LoginViewModel<LoginActivity>
+    private lateinit var _loginViewModel: LoginViewModel<LoginActivity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,25 +28,13 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
         val loginViewModel = LoginViewModel(this, contentView!!)
         setLoadingViewModel(loginViewModel)
 
-        this.loginViewModel = loginViewModel
+        _loginViewModel = loginViewModel
 
         getApplicationFactory().domainRepository.loadDomainOverrides()
         if (getApplicationFactory().userRepository.tryAutomaticLogin()) {
             val name = getApplicationFactory().userRepository.getLoggedInUser().givenName
             onLoginSuccessful(name)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        loginViewModel.resetState()
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-
-        loginViewModel.resetState()
     }
 
     override fun login(email: String, password: String) {
@@ -77,7 +65,7 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
             getString(R.string.trial_account_created)
         ) {
             yesButton {
-                loginViewModel.setUsernamePassword(event.trialUser.username, event.trialUser.password)
+                _loginViewModel.setUsernamePassword(event.trialUser.username, event.trialUser.password)
                 toast("Email & Passwort des Probeaccounts wurden eingefüllt")
             }
         }.show()
@@ -90,7 +78,8 @@ class LoginActivity : AbstractActivity(), LoginViewModel.Login {
     }
 
     private fun onLoginSuccessful(userGivenName: String) {
-        loginViewModel.showLoginSuccessful(userGivenName)
+        _loginViewModel.showLoginSuccessful(userGivenName)
         startActivity<OverviewActivity>()
+        finish()
     }
 }

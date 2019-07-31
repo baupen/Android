@@ -12,7 +12,6 @@ import io.mangel.issuemanager.factories.ApplicationFactory
 import io.mangel.issuemanager.models.ConstructionSite
 import io.mangel.issuemanager.models.User
 import kotlinx.android.synthetic.main.activity_overview.view.*
-import kotlinx.android.synthetic.main.activity_overview.view.welcome
 
 data class OverviewViewModel<T>(private val context: T, private val view: View, private val payload: Payload) :
     AbstractLoadingViewModel()

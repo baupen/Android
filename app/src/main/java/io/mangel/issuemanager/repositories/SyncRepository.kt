@@ -40,6 +40,9 @@ class SyncRepository(
     private var refreshTasksActive = 0
 
     fun sync() {
+        // throw event always if some view is too late
+        EventBus.getDefault().post(SyncStartedEvent())
+
         synchronized(this) {
             if (refreshTasksActive > 0) {
                 return
@@ -50,8 +53,6 @@ class SyncRepository(
 
         val authToken = authenticationService.getAuthenticationToken()
         val user = settingService.readUser() ?: return
-
-        EventBus.getDefault().post(SyncStartedEvent())
 
         val userMeta = ObjectMeta(user.id, user.lastChangeTime)
         val craftsmanMetas = craftsmanDataService.getAllAsObjectMeta()
@@ -84,13 +85,13 @@ class SyncRepository(
 
         downloadFiles()
 
-        someRefreshTaskHasFinished()
+        someRefreshTaskHasFinished(true)
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: ReadTaskFailed) {
-        someRefreshTaskHasFinished()
+        someRefreshTaskHasFinished(false)
     }
 
     @Suppress("unused")
@@ -101,11 +102,11 @@ class SyncRepository(
         }
     }
 
-    private fun someRefreshTaskHasFinished() {
+    private fun someRefreshTaskHasFinished(successful: Boolean? = null) {
         refreshTasksActive--
 
         if (refreshTasksActive == 0) {
-            EventBus.getDefault().post(SyncFinishedEvent())
+            EventBus.getDefault().post(SyncFinishedEvent(successful))
         }
     }
 
@@ -228,4 +229,4 @@ class SyncRepository(
 }
 
 class SyncStartedEvent
-class SyncFinishedEvent
+class SyncFinishedEvent(val result: Boolean?)
