@@ -1,7 +1,6 @@
 package io.mangel.issuemanager.models
 
 import org.threeten.bp.LocalDateTime
-import java.util.*
 
 class Issue(val id: String, val map: Map, val number: Int?, val wasAddedWithClient: Boolean) {
     var isMarked: Boolean = false

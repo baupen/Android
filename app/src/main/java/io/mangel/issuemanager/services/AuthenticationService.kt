@@ -21,15 +21,15 @@ class AuthenticationService(private val sqliteService: SqliteService) {
 
     private var _authenticationToken: AuthenticationToken? = null
     fun setAuthenticationToken(authenticationToken: AuthenticationToken) {
-        _authenticationToken = authenticationToken;
+        _authenticationToken = authenticationToken
     }
 
     fun clearAuthenticationToken() {
-        _authenticationToken = null;
+        _authenticationToken = null
     }
 
     fun getAuthenticationToken(): AuthenticationToken {
-        val authenticationToken = _authenticationToken ?: throw IllegalAccessException("Not authenticated");
+        val authenticationToken = _authenticationToken ?: throw IllegalAccessException("Not authenticated")
 
         return authenticationToken
     }

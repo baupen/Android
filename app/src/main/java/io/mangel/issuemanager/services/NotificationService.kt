@@ -5,7 +5,6 @@ import io.mangel.issuemanager.R
 import io.mangel.issuemanager.api.Error
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.toast
 
 class NotificationService(private val context: Context) {
     fun showNotification(notification: Notification) {
@@ -33,7 +32,7 @@ class NotificationService(private val context: Context) {
     }
 }
 
-enum class Notification() {
+enum class Notification {
     NO_INTERNET_ACCESS,
     REQUEST_FAILED
 }

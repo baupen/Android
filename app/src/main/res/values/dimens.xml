@@ -8,5 +8,4 @@
 
     <dimen name="text_margin">8sp</dimen>
     <dimen name="section_end">16sp</dimen>
-    <dimen name="activity_margin_negative">-16dp</dimen>
 </resources>

@@ -28,7 +28,7 @@ data class OverviewViewModel<T>(private val context: T, private val view: View, 
     }
 
     private fun displayUser() {
-        viewHolder.welcomeTextView.text = context.getString(R.string.welcome, payload.user.givenName);
+        viewHolder.welcomeTextView.text = context.getString(R.string.welcome, payload.user.givenName)
     }
 
     private fun displayConstructionSites() {

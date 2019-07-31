@@ -15,7 +15,7 @@ class TestDeserializationTest {
                     "id": "d80db661-5856-438f-85cf-63064a67a11d",
                     "filename": "some"
                 } 
-            """;
+            """
 
         val element = jsonToT(json, File::class.java)
 
@@ -36,7 +36,7 @@ class TestDeserializationTest {
                     "givenName": "someName",
                     "familyName": "someName"
                 } 
-            """;
+            """
 
         val element = jsonToT(json, User::class.java)
 
@@ -53,7 +53,7 @@ class TestDeserializationTest {
                     "error": 203,
                     "message": "invalid action"
                 } 
-            """;
+            """
 
         val element = deserializeResponse(json, CreateTrialAccountResponse::class.java)
 

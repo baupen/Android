@@ -3,7 +3,8 @@ package io.mangel.issuemanager.services.data
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import io.mangel.issuemanager.api.ObjectMeta
-import io.mangel.issuemanager.store.*
+import io.mangel.issuemanager.store.MetaProvider
+import io.mangel.issuemanager.store.SqliteEntry
 import org.jetbrains.anko.db.*
 
 class SqliteService(private val metaProvider: MetaProvider, context: Context) {
@@ -24,7 +25,7 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
 
         val tableName = meta.getTableName()
         val fieldList = meta.getFieldList().joinToString(separator = ",")
-        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { _ -> "?" }
+        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { "?" }
 
         db.use {
             execSQL("INSERT OR REPLACE INTO $tableName($fieldList) VALUES ($valuesPlaceholders)", meta.toArray(element))
@@ -40,7 +41,7 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
 
         val tableName = meta.getTableName()
         val fieldList = meta.getFieldList().joinToString(separator = ",")
-        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { _ -> "?" }
+        val valuesPlaceholders = meta.getFieldList().joinToString(separator = ",") { "?" }
 
         db.use {
             val sqlStatement = "INSERT OR REPLACE INTO $tableName($fieldList) VALUES ($valuesPlaceholders)"

@@ -23,7 +23,7 @@ class ModelConverter {
     }
 
     fun convert(map: Map, parentMap: io.mangel.issuemanager.models.Map?): io.mangel.issuemanager.models.Map {
-        return io.mangel.issuemanager.models.Map(map.id, parentMap, map.name, map.filePath)
+        return Map(map.id, parentMap, map.name, map.filePath)
     }
 
     fun convert(

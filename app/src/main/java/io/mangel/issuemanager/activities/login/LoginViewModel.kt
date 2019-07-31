@@ -85,7 +85,7 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
             viewHolder.passwordEditText.error = context.getString(R.string.password_too_short)
         }
 
-        viewHolder.loginButton.isEnabled = !usernameBlank && !passwordBlank;
+        viewHolder.loginButton.isEnabled = !usernameBlank && !passwordBlank
     }
 
     interface Login {
@@ -106,7 +106,7 @@ data class LoginViewModel<T>(private val context: T, private val view: View) : A
     fun showLoginSuccessful(givenName: String) {
         viewHolder.loginWrapper.visibility = View.GONE
         viewHolder.welcomeWrapper.visibility = View.VISIBLE
-        viewHolder.welcomeTextView.text = context.getString(R.string.welcome, givenName);
+        viewHolder.welcomeTextView.text = context.getString(R.string.welcome, givenName)
 
         showOnlyWelcomeView = false
     }

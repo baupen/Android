@@ -2,12 +2,11 @@ package io.mangel.issuemanager.api.tasks
 
 import io.mangel.issuemanager.api.ApiResponse
 import io.mangel.issuemanager.api.Client
-import io.mangel.issuemanager.api.DomainOverride
 import io.mangel.issuemanager.api.DomainOverrideRoot
 import io.mangel.issuemanager.api.Error
 
 
-class DomainOverridesTask(private val client: Client) : AbstractApiAsyncTask<Any, DomainOverrideRoot>(client) {
+class DomainOverridesTask(client: Client) : AbstractApiAsyncTask<Any, DomainOverrideRoot>(client) {
     override fun callApi(request: Any, client: Client): ApiResponse<DomainOverrideRoot>? {
         return client.getDomainOverrides()
     }

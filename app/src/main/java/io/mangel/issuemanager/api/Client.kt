@@ -49,7 +49,7 @@ class Client(
         val response = httpService.postJsonForFile("$baseUrl/file/download", requestJson, filePath) ?: return null
 
         return if (response.isSuccessful) {
-            ApiResponse(true);
+            ApiResponse(true)
         } else {
             deserializeRoot(response, Response::class.java)
         }
@@ -134,7 +134,7 @@ class Client(
     }
 
     private fun <T1 : Response> deserializeRoot(json: String?, parameterT: Class<T1>): ApiResponse<T1>? {
-        val rootType = Types.newParameterizedType(Root::class.java, parameterT);
+        val rootType = Types.newParameterizedType(Root::class.java, parameterT)
         val root = serializationService.deserialize<Root<T1>>(json, rootType) ?: return ApiResponse(false)
 
         return ApiResponse(root.status == STATUS_SUCCESS, root.data, Error.tryParseFrom(root.error))

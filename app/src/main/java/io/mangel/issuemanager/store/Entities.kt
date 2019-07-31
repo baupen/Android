@@ -1,7 +1,5 @@
 package io.mangel.issuemanager.store
 
-import java.util.*
-
 sealed class SqliteEntry(
     val id: String,
     val lastChangeTime: String
@@ -17,8 +15,7 @@ class ConstructionSite(
     val imagePath: String?,
     lastChangeTime: String
 ) :
-    SqliteEntry(id, lastChangeTime) {
-}
+    SqliteEntry(id, lastChangeTime)
 
 class Craftsman(
     id: String,
@@ -27,8 +24,7 @@ class Craftsman(
     val trade: String,
     lastChangeTime: String
 ) :
-    SqliteEntry(id, lastChangeTime) {
-}
+    SqliteEntry(id, lastChangeTime)
 
 class Map(
     id: String,
@@ -38,8 +34,7 @@ class Map(
     val filePath: String?,
     lastChangeTime: String
 ) :
-    SqliteEntry(id, lastChangeTime) {
-}
+    SqliteEntry(id, lastChangeTime)
 
 class Issue(
     id: String,
@@ -62,8 +57,7 @@ class Issue(
     val mapFileID: String?,
     lastChangeTime: String
 ) :
-    SqliteEntry(id, lastChangeTime) {
-}
+    SqliteEntry(id, lastChangeTime)
 
 data class User(val id: String, val lastChangeTime: String, val givenName: String, val familyName: String)
 data class AuthenticationToken(val host: String, val authenticationToken: String, val userID: String)

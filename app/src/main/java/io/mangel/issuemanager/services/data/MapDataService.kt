@@ -19,7 +19,7 @@ class MapDataService(private val sqliteService: SqliteService) : AbstractDataSer
 
     class MapFile(val filePath: String, val meta: ObjectMeta)
 
-    class MapFileRowParser() : RowParser<MapFile> {
+    class MapFileRowParser : RowParser<MapFile> {
         override fun parseRow(columns: Array<Any?>): MapFile {
             return MapFile(columns[0] as String, ObjectMeta(columns[1] as String, columns[2] as String))
         }

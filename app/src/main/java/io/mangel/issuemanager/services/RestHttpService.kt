@@ -1,7 +1,9 @@
 package io.mangel.issuemanager.services
 
-import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
@@ -64,7 +66,7 @@ class RestHttpService(private val notificationService: NotificationService, priv
     }
 
     private fun getStringResponse(request: Request): StringResponse? {
-        val response = execute(request) ?: return null;
+        val response = execute(request) ?: return null
 
         response.use {
             return StringResponse(response.isSuccessful, response.body?.string())
@@ -72,7 +74,7 @@ class RestHttpService(private val notificationService: NotificationService, priv
     }
 
     private fun getFileResponse(request: Request, filePath: String): FileResponse? {
-        val response = execute(request) ?: return null;
+        val response = execute(request) ?: return null
 
         response.use {
             var errorBody: String? = null
@@ -91,14 +93,14 @@ class RestHttpService(private val notificationService: NotificationService, priv
     }
 
     private fun execute(request: Request): okhttp3.Response? {
-        try {
-            return client.newCall(request).execute()
+        return try {
+            client.newCall(request).execute()
         } catch (exception: UnknownHostException) {
             notificationService.showNotification(Notification.NO_INTERNET_ACCESS)
-            return null
+            null
         } catch (exception: IOException) {
             notificationService.showNotification(Notification.REQUEST_FAILED)
-            return null
+            null
         }
     }
 

@@ -26,7 +26,7 @@ class MetaProvider {
 }
 
 
-abstract class Meta<T>() {
+abstract class Meta<T> {
     abstract fun getTableName(): String
 
     abstract fun getColumns(): Array<Pair<String, SqlType>>

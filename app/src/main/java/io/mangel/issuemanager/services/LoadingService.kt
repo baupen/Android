@@ -16,24 +16,24 @@ class LoadingService(private val loadingIndicator: LoadingIndicator) {
             loadingIndicator.showIndeterminateProgress()
         }
 
-        taskActive[event.taskId] = true;
+        taskActive[event.taskId] = true
     }
 
     fun onProgress(event: TaskProgressEvent) {
-        progressByTask[event.taskId] = event.progress;
-        maxByTask[event.taskId] = event.max;
+        progressByTask[event.taskId] = event.progress
+        maxByTask[event.taskId] = event.max
 
         showDeterminateProgress()
     }
 
     fun onFinished(event: TaskFinishedEvent) {
-        taskActive[event.taskId] = false;
-        progressByTask[event.taskId] = maxByTask[event.taskId]!!;
+        taskActive[event.taskId] = false
+        progressByTask[event.taskId] = maxByTask[event.taskId]!!
 
         if (taskActive.values.none { it }) {
-            taskActive = HashMap();
-            progressByTask = HashMap();
-            maxByTask = HashMap();
+            taskActive = HashMap()
+            progressByTask = HashMap()
+            maxByTask = HashMap()
 
             loadingIndicator.hideProgressIndicator()
         } else {

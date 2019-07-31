@@ -1,5 +1,3 @@
 package io.mangel.issuemanager.repositories
 
-class CraftsmanRepository {
-
-}
+class CraftsmanRepository

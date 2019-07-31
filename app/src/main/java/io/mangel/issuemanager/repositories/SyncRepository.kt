@@ -6,7 +6,6 @@ import io.mangel.issuemanager.api.ReadRequest
 import io.mangel.issuemanager.api.tasks.*
 import io.mangel.issuemanager.events.*
 import io.mangel.issuemanager.factories.ClientFactory
-import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.services.AuthenticationService
 import io.mangel.issuemanager.services.FileService
 import io.mangel.issuemanager.services.SettingService
@@ -14,16 +13,13 @@ import io.mangel.issuemanager.services.data.ConstructionSiteDataService
 import io.mangel.issuemanager.services.data.CraftsmanDataService
 import io.mangel.issuemanager.services.data.IssueDataService
 import io.mangel.issuemanager.services.data.MapDataService
-import io.mangel.issuemanager.store.AuthenticationToken
 import io.mangel.issuemanager.store.StoreConverter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.io.SyncFailedException
 
 class SyncRepository(
     private val storeConverter: StoreConverter,
-    private val modelConverter: ModelConverter,
     private val constructionSiteDataService: ConstructionSiteDataService,
     private val mapDataService: MapDataService,
     private val issueDataService: IssueDataService,

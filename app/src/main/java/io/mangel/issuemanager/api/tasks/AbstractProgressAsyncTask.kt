@@ -1,14 +1,14 @@
 package io.mangel.issuemanager.api.tasks
 
 import android.os.AsyncTask
-import io.mangel.issuemanager.events.TaskProgressEvent
 import io.mangel.issuemanager.events.ProgressTaskStartedEvent
 import io.mangel.issuemanager.events.TaskFinishedEvent
+import io.mangel.issuemanager.events.TaskProgressEvent
 import org.greenrobot.eventbus.EventBus
 import java.util.*
 
 
-abstract class AbstractProgressAsyncTask<T1, T2>() : AsyncTask<T1, AbstractProgressAsyncTask.ProgressUpdate<T2>, Unit>() {
+abstract class AbstractProgressAsyncTask<T1, T2> : AsyncTask<T1, AbstractProgressAsyncTask.ProgressUpdate<T2>, Unit>() {
 
     protected abstract fun execute(request: T1): T2
 

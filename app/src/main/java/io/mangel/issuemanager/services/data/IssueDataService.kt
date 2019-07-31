@@ -19,7 +19,7 @@ class IssueDataService(private val sqliteService: SqliteService) : AbstractDataS
 
     class IssueImage(val imagePath: String, val meta: ObjectMeta)
 
-    class IssueImageRowParser() : RowParser<IssueImage> {
+    class IssueImageRowParser : RowParser<IssueImage> {
         override fun parseRow(columns: Array<Any?>): IssueImage {
             return IssueImage(columns[0] as String, ObjectMeta(columns[1] as String, columns[2] as String))
         }

@@ -1,7 +1,5 @@
 package io.mangel.issuemanager.api
 
-import java.util.*
-
 abstract class Response
 
 data class CreateTrialAccountResponse(val trialUser: TrialUser) : Response()

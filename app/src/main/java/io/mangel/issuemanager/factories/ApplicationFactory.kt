@@ -4,12 +4,11 @@ import android.content.Context
 import io.mangel.issuemanager.models.ModelConverter
 import io.mangel.issuemanager.repositories.*
 import io.mangel.issuemanager.services.*
-import io.mangel.issuemanager.services.SettingService
 import io.mangel.issuemanager.services.data.*
 import io.mangel.issuemanager.store.MetaProvider
 import io.mangel.issuemanager.store.StoreConverter
 
-public class ApplicationFactory(context: Context) {
+class ApplicationFactory(context: Context) {
     companion object {
         private var defaultInstance: ApplicationFactory? = null
 
@@ -46,7 +45,7 @@ public class ApplicationFactory(context: Context) {
     private val issueDataService = IssueDataService(sqliteService)
     private val craftsmanDataService = CraftsmanDataService(sqliteService)
 
-    val authenticationService = AuthenticationService(sqliteService)
+    private val authenticationService = AuthenticationService(sqliteService)
 
 
     val domainRepository = DomainOverridesRepository(clientFactory)
@@ -74,7 +73,6 @@ public class ApplicationFactory(context: Context) {
 
     val syncRepository = SyncRepository(
         storeConverter,
-        modelConverter,
         constructionSiteDataService,
         mapDataService,
         issueDataService,

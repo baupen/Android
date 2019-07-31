@@ -111,7 +111,7 @@ class UserRepository(
         _user = user
 
         EventBus.getDefault().post(LoadedUserEvent())
-        return user;
+        return user
     }
 
     private fun getSHA256Hash(text: String): String {

@@ -2,7 +2,6 @@ package io.mangel.issuemanager.api.tasks
 
 import io.mangel.issuemanager.api.*
 import io.mangel.issuemanager.api.Map
-import java.util.*
 
 
 class ReadTask(client: Client) : AbstractApiAsyncTask<ReadRequest, ReadResponse>(client) {

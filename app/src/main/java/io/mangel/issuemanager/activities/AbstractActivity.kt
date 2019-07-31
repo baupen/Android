@@ -2,7 +2,6 @@ package io.mangel.issuemanager.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.jakewharton.threetenabp.AndroidThreeTen
 import io.mangel.issuemanager.events.TaskProgressEvent
 import io.mangel.issuemanager.events.TaskFinishedEvent
 import io.mangel.issuemanager.events.TaskStartedEvent
@@ -19,28 +18,28 @@ abstract class AbstractActivity : AppCompatActivity() {
         EventBus.getDefault().register(this)
     }
 
-    private var loadingService: LoadingService? = null
+    private var _loadingService: LoadingService? = null
 
     protected fun setLoadingViewModel(loadingViewModel: AbstractLoadingViewModel) {
-        this.loadingService = LoadingService(loadingViewModel)
+        this._loadingService = LoadingService(loadingViewModel)
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTaskStarted(taskStartedEvent: TaskStartedEvent) {
-        loadingService?.onStarted(taskStartedEvent)
+        _loadingService?.onStarted(taskStartedEvent)
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTaskProgress(taskProgressEvent: TaskProgressEvent) {
-        loadingService?.onProgress(taskProgressEvent)
+        _loadingService?.onProgress(taskProgressEvent)
     }
 
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onTaskFinished(taskFinishedEvent: TaskFinishedEvent) {
-        loadingService?.onFinished(taskFinishedEvent)
+        _loadingService?.onFinished(taskFinishedEvent)
     }
 
     override fun onDestroy() {

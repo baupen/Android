@@ -20,7 +20,7 @@ class ConstructionSiteDataService(private val sqliteService: SqliteService) :
 
     class ConstructionSiteImage(val imagePath: String, val meta: ObjectMeta)
 
-    class ConstructionSiteImageRowParser() : RowParser<ConstructionSiteImage> {
+    class ConstructionSiteImageRowParser : RowParser<ConstructionSiteImage> {
         override fun parseRow(columns: Array<Any?>): ConstructionSiteImage {
             return ConstructionSiteImage(columns[0] as String, ObjectMeta(columns[1] as String, columns[2] as String))
         }

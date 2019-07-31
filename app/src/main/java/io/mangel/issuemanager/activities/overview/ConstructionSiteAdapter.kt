@@ -17,13 +17,13 @@ class ConstructionSiteAdapter(
     private val overview: OverviewViewModel.Overview,
     private val fileService: FileService
 ) : RecyclerView.Adapter<ConstructionSiteAdapter.ViewHolder>() {
-    private var _width: Int? = null;
+    private var _width: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(io.mangel.issuemanager.R.layout.row_construction_site, parent, false)
 
-        var width = this._width;
+        var width = this._width
         if (width == null) {
             width = (parent.measuredWidth * .66).toInt()
             _width = width
@@ -54,7 +54,7 @@ class ConstructionSiteAdapter(
 
     private fun loadImageIfExists(holder: ViewHolder, fileName: String): Boolean {
         if (!fileService.exists(fileName)) {
-            return false;
+            return false
         }
 
         val imageBytes = fileService.read(fileName)
