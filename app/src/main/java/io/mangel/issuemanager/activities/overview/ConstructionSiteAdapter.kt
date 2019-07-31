@@ -42,7 +42,9 @@ class ConstructionSiteAdapter(
         holder.addressView.text = constructionSite.address.toString()
 
         if (constructionSite.imagePath != null) {
-            if (!loadImageIfExists(holder, constructionSite.imagePath)) {
+            val loadedSuccessful = loadImageIfExists(holder, constructionSite.imagePath)
+
+            if (!loadedSuccessful) {
                 imageLoadFailedViewByFilename[constructionSite.imagePath] = holder
             }
         }

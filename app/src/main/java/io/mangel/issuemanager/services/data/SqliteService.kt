@@ -61,7 +61,7 @@ class SqliteService(private val metaProvider: MetaProvider, context: Context) {
         val tableName = meta.getTableName()
 
         db.use {
-            val sqlStatement = "DELETE FROM $tableName WHERE id IN (${elements.joinToString(separator = ",")})"
+            execSQL("DELETE FROM $tableName WHERE id IN (${elements.joinToString(separator = ",")})")
         }
     }
 
