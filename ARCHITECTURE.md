@@ -14,7 +14,7 @@ the activity gets the data from the repositories.
 the activity reacts to relevant events and informs the user about it.
 for example, it may displays an error message if a specific request has failed or refreshes the displayed data if it has changed.
 
-each acitivity has its own `viewModel` which displays the data.  
+each acitivity has its own `viewModel` which displays the data.
 if the user performs an action which has effects besides altering the UI, the viewModel calls a method of the activity.  
 each viewModel has therefore three arguments: the `View` it alters, the `Payload` with the data it displayed, and the `T` it relays actions of the user.
 
@@ -28,13 +28,13 @@ it contains all the entites, requests & responses from the API and provides back
 
 ... comunicate when background tasks have relevant results for its consumers.
 
-`Saved` events are published when the database is changed outside of the authoritative repository. 
+`Saved` events are published when the database is changed outside of the authoritative repository.
 For example, if some service modifies construction sites of the database, it must publish the `SavedConstructionSiteEvent` so the `ConstructionSiteRepository` can reload its state. 
 
 `Loaded` events are published when a repository changed its state published to its consumers.
 For example, if the repository has to reload because it received a `SavedConstructionSiteEvent` it publishes as `LoadedConstructionSiteEvent` so the activities can refresh its construction site views.
 
-Each background task also published events when they start, progress or finish. 
+Each background task also published events when they start, progress or finish.
 This allows the UI to display when something in the background is going on without having to know what.
 
 ## factories
@@ -62,13 +62,31 @@ they convert database entities into usable models.
 
 ... abstract technical details
 
-services make the technical domain easy usable by repositories or other services.
-they are easily testable.
+services make the technical domain easy usable by repositories or other services and are easily testable.
 
 the `SqliteService` may not be consumed by the repositories of services outside its `services.data` namespace.
-its API allows for very general usage (and hence easy errors). 
+its API allows for very general usage (and hence easy errors).
 hence each table/model has its own data service (like `ConstructionSiteDataService`) which should be used by other repositories and services.
 
 ## views
 
 ... contain custom UI elements
+
+## resources
+
+### layouts
+
+use these prefixes
+- `activity` for an activity (like `activity_main`)
+- `fragment` for a fragment
+- `row` for an element in a `RecyclerView` (like `row_construction_site`)
+
+### translations
+
+... are done using lokalise
+
+you need the (https://docs.lokalise.co/en/articles/1400697-lokalise-cli-tool)[lokalise CLI] and an (https://lokalise.co/profile)[API token] which you place in `local.properties` like `lokalise.token=MY_TOKEN`
+
+if you are adding new strings, upload the strings.xml to lokalise manually  
+if you need the newest changes from the translator, execute `gradlew downloadTranslations`
+
