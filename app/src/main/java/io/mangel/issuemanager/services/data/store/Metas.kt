@@ -206,9 +206,9 @@ class IssueMeta : Meta<Issue>() {
             Issue(
                 columns[0] as String,
                 columns[1] as String,
-                columns[2] as Boolean,
-                columns[3] as Int?,
-                columns[4] as Boolean,
+                (columns[2] as String) != "0",
+                (columns[3] as String?)?.toIntOrNull(),
+                (columns[4] as String) != "0",
                 columns[5] as String?,
                 columns[6] as String?,
                 columns[7] as String?,
@@ -218,9 +218,9 @@ class IssueMeta : Meta<Issue>() {
                 columns[11] as String?,
                 columns[12] as String?,
                 columns[13] as String?,
-                columns[14] as Double?,
-                columns[15] as Double?,
-                columns[16] as Double?,
+                (columns[14] as String?)?.toDoubleOrNull(),
+                (columns[15] as String?)?.toDoubleOrNull(),
+                (columns[16] as String?)?.toDoubleOrNull(),
                 columns[17] as String?,
                 columns[18] as String
             )
