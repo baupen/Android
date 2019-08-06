@@ -65,7 +65,10 @@ class ApplicationFactory(context: Context) {
         modelConverter
     )
 
-    val mapRepository = MapRepository()
+    val mapRepository = MapRepository(
+        mapDataService,
+        modelConverter
+    )
 
     val issueRepository = IssueRepository()
 
