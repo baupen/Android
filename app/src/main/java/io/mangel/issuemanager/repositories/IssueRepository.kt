@@ -16,35 +16,39 @@ class IssueRepository(
     var isAbnahmeModusActive = false
     private var initialized = false
     private val issuesParsed = ArrayList<Issue>()
-    private val mapIdToOpenIssueCount = HashMap<String, Int>()  // contains both, those in normal and in Abnahmemodus
-    private val mapIdToInvestigationCount = HashMap<String, Int>()
+    private val mapToOpenIssues = HashMap<String, Int>()
+    private val mapToOpenIssuesRec = HashMap<String, Int>()
+    private val mapToToInvestigateIssues = HashMap<String, Int>()
+    private val mapToToInvestigateIssuesRec = HashMap<String, Int>()
 
     // TODO: snoop for updates
 
-    fun getMapIdToOpenIssueCount() : HashMap<String, Int> {
-      synchronized(this){
-          if (!initialized) loadRepository()
-          return mapIdToOpenIssueCount
-      }
-    }
-
-    fun getMapIdToInvestigationCount() : HashMap<String, Int> {
+    fun getOpenIssuesCount(mapId: String, recursive: Boolean = false) : Int {
         synchronized(this){
             if (!initialized) loadRepository()
-            return mapIdToInvestigationCount
+            if (recursive) return mapToOpenIssuesRec[mapId] ?: 0
+            return mapToOpenIssues[mapId] ?: 0
         }
     }
 
-    private fun loadRepository(){
-        simpleParse()
-        setUpIssuesMapping(mapIdToOpenIssueCount) { issue -> issue.status.review == null}
-        setUpIssuesMapping(mapIdToInvestigationCount) {
-                issue -> issue.status.response != null && issue.status.review == null
+    fun getToInvestigateIssuesCount(mapId: String, recursive: Boolean = false) : Int {
+        synchronized(this){
+            if (!initialized) loadRepository()
+            if (recursive) return mapToToInvestigateIssuesRec[mapId] ?: 0
+            return mapToToInvestigateIssues[mapId] ?: 0
         }
+    }
+
+    private fun loadRepository() {
+        basicParse()
+        calculateMapToCount(mapToOpenIssues) { issue -> issue.status.review == null }
+        recursiveMapToCount(mapToOpenIssuesRec, mapToOpenIssues)
+        calculateMapToCount(mapToToInvestigateIssues) { i -> i.status.review == null && i.status.response != null }
+        recursiveMapToCount(mapToToInvestigateIssuesRec, mapToToInvestigateIssues)
         initialized = true
     }
 
-    private fun simpleParse(){
+    private fun basicParse(){
         val entities = issueDataService.getAll()
         val mapRepo = applicationFactory.mapRepository
         val craftRepo = applicationFactory.craftsmanRepository
@@ -58,16 +62,18 @@ class IssueRepository(
     }
 
     // issueFilter decides which issues should be counted
-    private fun setUpIssuesMapping(destination: HashMap<String, Int>, issueFilter: (Issue) -> Boolean) {
-        val tmp = HashMap<String, Int>()
+    private fun calculateMapToCount(destination: HashMap<String, Int>, issueFilter: (Issue) -> Boolean) {
         for (issue in issuesParsed){
             if (!issueFilter(issue)) continue
             val mapId = issue.map.id
-            tmp[mapId] = tmp[mapId]?.plus(1) ?: 1
+            destination[mapId] = destination[mapId]?.plus(1) ?: 1
         }
+    }
+
+    private fun recursiveMapToCount(destination: HashMap<String, Int>, baseMapping: HashMap<String, Int>){
         val mapRepo = applicationFactory.mapRepository
         val rootMapIds =  mapRepo.getChildren(null)!!.map { map -> map.id }
-        rootMapIds.forEach { id -> treeAddUp(id, destination, tmp, mapRepo) }
+        rootMapIds.forEach { id -> treeAddUp(id, destination, baseMapping, mapRepo) }
     }
 
     private fun treeAddUp(mapId: String, destination: HashMap<String, Int>, mapIdToOwnIssueCount: HashMap<String, Int>, mapRepo: MapRepository) : Int {

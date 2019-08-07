@@ -1,20 +1,12 @@
 package io.mangel.issuemanager.activities.maps
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.view.MenuItem
+import androidx.recyclerview.widget.RecyclerView
 import io.mangel.issuemanager.R
 import io.mangel.issuemanager.activities.AbstractActivity
-
-import io.mangel.issuemanager.dummy.DummyContent
 import io.mangel.issuemanager.models.Map
 import kotlinx.android.synthetic.main.activity_map_list.*
-import kotlinx.android.synthetic.main.map_list_content.view.*
 import kotlinx.android.synthetic.main.map_list.*
 import org.jetbrains.anko.startActivity
 
@@ -33,16 +25,12 @@ class MapListActivity : AbstractActivity() {
      * device.
      */
     private var twoPane: Boolean = false
-    private var currentRoot: String? = null
-    private var currentMaps: List<Map> = emptyList()
+    private fun currentRoot() = intent.getStringExtra(ROOT_ID)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_list)
         setSupportActionBar(toolbar)
-
-        currentRoot = intent.getStringExtra(ROOT_ID)
-        currentMaps = getApplicationFactory().mapRepository.getChildren(currentRoot)!!
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -63,16 +51,28 @@ class MapListActivity : AbstractActivity() {
         }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
+        val issueRepo = getApplicationFactory().issueRepository
+        val mapsToBeDisplayed = mapsToBeDisplayed()
+        val issueCounts = mapsToBeDisplayed.map {
+                map ->  issueRepo.getOpenIssuesCount(map.id,map.id != currentRoot())
+        }
+        val investigateCounts = mapsToBeDisplayed.map {
+                map -> issueRepo.getToInvestigateIssuesCount(map.id, map.id != currentRoot())
+        }
         recyclerView.adapter = MapAdapter(
-            this,
-            currentMaps,
-            getApplicationFactory().issueRepository.getMapIdToOpenIssueCount(),
-            getApplicationFactory().issueRepository.getMapIdToInvestigationCount()
+            this, mapsToBeDisplayed, issueCounts, investigateCounts
         )
     }
 
+    private fun mapsToBeDisplayed() : List<Map> {
+        val currentRoot = currentRoot()
+        val children = getApplicationFactory().mapRepository.getChildren(currentRoot)!!.sortedBy { map -> map.name }
+        if (currentRoot == null) return children
+        return listOf(getApplicationFactory().mapRepository.getMap(currentRoot)!!) + children
+    }
+
     fun mapHasBeenClicked(mapId: String) {
-        if (mapId == currentRoot || getApplicationFactory().mapRepository.getChildren(mapId)!!.isEmpty()){
+        if (mapId == currentRoot() || getApplicationFactory().mapRepository.getChildren(mapId)!!.isEmpty()){
             openDetailActivity(mapId)
         } else {
             val title = getApplicationFactory().mapRepository.getMap(mapId)?.name ?: "Kein Name"
@@ -101,58 +101,5 @@ class MapListActivity : AbstractActivity() {
     companion object {
         const val ROOT_ID = "root"
         const val TITLE = "title"
-    }
-
-    class SimpleItemRecyclerViewAdapter(
-        private val parentActivity: MapListActivity,
-        private val values: List<DummyContent.DummyItem>,
-        private val twoPane: Boolean
-    ) : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
-
-        private val onClickListener: View.OnClickListener
-
-        init {
-            onClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
-                if (twoPane) {
-                    val fragment = MapDetailFragment().apply {
-                        arguments = Bundle().apply {
-                            putString(MapDetailFragment.ARG_ITEM_ID, item.id)
-                        }
-                    }
-                    parentActivity.supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.map_detail_container, fragment)
-                        .commit()
-                } else {
-                    val intent = Intent(v.context, MapDetailActivity::class.java).apply {
-                        putExtra(MapDetailFragment.ARG_ITEM_ID, item.id)
-                    }
-                    v.context.startActivity(intent)
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.map_list_content, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = values[position]
-            holder.idView.text = item.id
-
-            with(holder.itemView) {
-                tag = item
-                setOnClickListener(onClickListener)
-            }
-        }
-
-        override fun getItemCount() = values.size
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val idView: TextView = view.id_text
-        }
     }
 }

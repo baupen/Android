@@ -10,12 +10,15 @@ import kotlinx.android.synthetic.main.map_list_content.view.*
 
 class MapAdapter(
     private val parentActivity: MapListActivity,
-    private val maps: List<Map>,
-    private val mapIdToRecursiveIssueCount: HashMap<String, Int>,
-    private val mapIdToInvestigationCount: HashMap<String, Int>
+    private val currentMaps: List<Map>,
+    private val mapIssueCounts: List<Int>,
+    private val mapInvestigationCounts: List<Int>
 ) : RecyclerView.Adapter<MapAdapter.ViewHolder>() {
 
     private val onClickListener : View.OnClickListener
+
+    // if you want to add the iOS way of making subheaders:
+    // https://newfivefour.com/android-recyclerview-section-headers-view-types.html
 
     init {
         onClickListener = View.OnClickListener { v ->
@@ -30,14 +33,12 @@ class MapAdapter(
         return ViewHolder(view)
     }
 
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val map = maps.sortedBy { m -> m.name } [position]  // TODO: make efficient
+        val map = currentMaps[position]
         holder.mapName.text = map.name // TODO: null safety
-        holder.issuesCount.text = "${mapIdToRecursiveIssueCount[map.id]} offene Pendenzen"
-        val nbrOfIssuesToInvestigate = mapIdToInvestigationCount[map.id] ?: 0
-        if (nbrOfIssuesToInvestigate == 0) holder.investigationCount.visibility = View.GONE
-        else holder.investigationCount.text = nbrOfIssuesToInvestigate.toString()
+        holder.issuesCount.text = "${mapIssueCounts[position]} offene Pendenzen"
+        holder.investigationCount.text = mapInvestigationCounts[position].toString()
+        if (mapInvestigationCounts[position] == 0) holder.investigationCount.visibility = View.GONE
 
         with(holder.itemView){
             tag = map
@@ -45,8 +46,7 @@ class MapAdapter(
         }
     }
 
-    override fun getItemCount() = maps.size
-
+    override fun getItemCount() = currentMaps.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val mapName: TextView = view.id_text

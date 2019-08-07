@@ -38,8 +38,10 @@ class MapRepository(
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: SavedMapsEvent) {
-        loadMaps()
-        EventBus.getDefault().post(LoadedMapsEvent())
+        synchronized(this){
+            loadMaps()
+            EventBus.getDefault().post(LoadedMapsEvent())
+        }
     }
 
     private fun loadMaps() {
