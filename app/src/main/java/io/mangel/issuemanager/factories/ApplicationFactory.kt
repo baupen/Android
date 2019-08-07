@@ -70,9 +70,16 @@ class ApplicationFactory(context: Context) {
         modelConverter
     )
 
-    val issueRepository = IssueRepository()
+    val issueRepository = IssueRepository(
+        issueDataService,
+        modelConverter,
+        this
+    )
 
-    val craftsmanRepository = CraftsmanRepository()
+    val craftsmanRepository = CraftsmanRepository(
+        craftsmanDataService,
+        modelConverter
+    )
 
     val syncRepository = SyncRepository(
         storeConverter,

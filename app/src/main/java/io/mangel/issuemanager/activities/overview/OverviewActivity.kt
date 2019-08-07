@@ -3,7 +3,6 @@ package io.mangel.issuemanager.activities.overview
 import android.os.Bundle
 import io.mangel.issuemanager.R
 import io.mangel.issuemanager.activities.AbstractActivity
-import io.mangel.issuemanager.activities.navigation.NavigationActivity
 import io.mangel.issuemanager.api.tasks.FileDownloadFinished
 import io.mangel.issuemanager.events.LoadedConstructionSitesEvent
 import io.mangel.issuemanager.events.LoadedUserEvent
@@ -14,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.iterator
 import io.mangel.issuemanager.activities.login.LoginActivity
+import io.mangel.issuemanager.activities.maps.MapListActivity
 import io.mangel.issuemanager.repositories.SyncFinishedEvent
 import io.mangel.issuemanager.repositories.SyncStartedEvent
 import org.jetbrains.anko.*
@@ -78,7 +78,10 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     }
 
     override fun navigate(constructionSite: ConstructionSite) {
-        startActivity<NavigationActivity>(NavigationActivity.ARGUMENTS_CONSTRUCTION_SITE_ID to constructionSite.id)
+        startActivity<MapListActivity>(
+            MapListActivity.ROOT_ID to null,
+            MapListActivity.TITLE to constructionSite.name
+        )
     }
 
     @Suppress("unused")

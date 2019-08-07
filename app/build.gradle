@@ -41,6 +41,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.0.1" // REST http library
     implementation 'org.greenrobot:eventbus:3.1.1' // send & receive events
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.3' // bring api 26 datetime functions to api level 21
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12' // test library
     testImplementation "com.google.truth:truth:1.0" // assertion library
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:1.3.41" // reflection

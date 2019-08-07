@@ -19,15 +19,7 @@ class MapRepository(
 
     private val _maps = ArrayList<Map>()
     private val _parentChildMapping = HashMap<String?, ArrayList<Map>>()
-
     private var initialized = false
-
-    fun getTopLevelMaps(): List<Map> {
-        synchronized(this){
-            if (!initialized) loadMaps()
-            return _parentChildMapping[null]!!.toList()
-        }
-    }
 
     fun getMap(id: String): Map? {
         synchronized(this){
@@ -36,7 +28,7 @@ class MapRepository(
         }
     }
 
-    fun getChildren(id: String): List<Map>? {
+    fun getChildren(id: String?): List<Map>? {
         synchronized(this){
             if (!initialized) loadMaps()
             return if (_parentChildMapping.containsKey(id)) _parentChildMapping[id]!!.toList() else null
@@ -54,16 +46,21 @@ class MapRepository(
         _maps.clear()
         val entityMaps = mapDataService.getAll()
 
+        // the tree is traversed level by level from the roots down
         var lastRoundIds = listOf<String?>(null)
         while (_maps.size != entityMaps.size) {
-            val entityMapsThisRound = entityMaps.filter { m -> lastRoundIds.contains(m.parentId) }
-            for (em in entityMapsThisRound) {
-                val parentMap = _maps.find { m -> m.id == em.parentId }
-                val model = modelConverter.convert(em, parentMap)
+            val childrenOfLastRoundMaps = entityMaps.filter { m -> lastRoundIds.contains(m.parentId) }
+            for (child in childrenOfLastRoundMaps) {
+                val parentMap = _maps.find { potentialParent -> potentialParent.id == child.parentId }
+                val model = modelConverter.convert(child, parentMap)
                 placeDownMap(model)
             }
-            lastRoundIds = entityMapsThisRound.map { m -> m.id }
+            lastRoundIds = childrenOfLastRoundMaps.map { m -> m.id }
         }
+        // the maps without any children aren't inserted into the map yet
+        val idsOfMapsWithoutChildren = entityMaps.map { m -> m.id }.toSet().minus(_parentChildMapping.keys)
+        idsOfMapsWithoutChildren.forEach { id -> _parentChildMapping[id] = ArrayList<Map>()}
+
         initialized = true
     }
 

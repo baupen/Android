@@ -4,7 +4,9 @@ import io.mangel.issuemanager.services.data.store.ConstructionSite
 import io.mangel.issuemanager.services.data.store.Issue
 import io.mangel.issuemanager.services.data.store.Map
 import io.mangel.issuemanager.services.data.store.User
+import io.mangel.issuemanager.services.data.store.Craftsman
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZonedDateTime
 
 class ModelConverter {
     fun convert(user: User): io.mangel.issuemanager.models.User {
@@ -22,6 +24,10 @@ class ModelConverter {
         return ConstructionSite(constructionSite.id, constructionSite.name, address, constructionSite.imagePath)
     }
 
+    fun convert(craftsman: Craftsman): io.mangel.issuemanager.models.Craftsman {
+        return Craftsman(craftsman.id, craftsman.name, craftsman.trade)
+    }
+
     fun convert(map: Map, parentMap: io.mangel.issuemanager.models.Map?): io.mangel.issuemanager.models.Map {
         return Map(map.id, parentMap, map.name, map.filePath)
     }
@@ -29,7 +35,7 @@ class ModelConverter {
     fun convert(
         issue: Issue,
         map: io.mangel.issuemanager.models.Map,
-        craftsman: Craftsman?
+        craftsman: io.mangel.issuemanager.models.Craftsman?
     ): io.mangel.issuemanager.models.Issue {
         val modelIssue = Issue(issue.id, map, issue.number, issue.wasAddedWithClient)
 
@@ -60,7 +66,7 @@ class ModelConverter {
             return null
         }
 
-        val date = LocalDateTime.parse(time)
+        val date = ZonedDateTime.parse(time).toLocalDateTime()
         return Event(date, author)
     }
 
