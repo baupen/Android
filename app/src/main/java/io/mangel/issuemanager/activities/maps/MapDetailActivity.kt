@@ -19,7 +19,7 @@ class MapDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_detail)
-//        setSupportActionBar(detail_toolbar)
+        setSupportActionBar(detail_toolbar)
 
 //        fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)

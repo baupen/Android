@@ -30,7 +30,7 @@ class MapListActivity : AbstractActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_list)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(detail_toolbar)
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -81,10 +81,11 @@ class MapListActivity : AbstractActivity() {
     }
 
     private fun openDetailActivity(mapId: String?) {
+        val filePath = getApplicationFactory().mapRepository.getMap(mapId!!)!!.filePath
         if (twoPane) {
             val fragment = MapDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(MapDetailFragment.ARG_ITEM_ID, mapId)
+                    putString(MapDetailFragment.ARG_ITEM_ID, filePath)
                 }
             }
             this.supportFragmentManager
@@ -93,7 +94,7 @@ class MapListActivity : AbstractActivity() {
                 .commit()
         } else {
             startActivity<MapDetailActivity>(
-                MapDetailFragment.ARG_ITEM_ID to mapId
+                MapDetailFragment.ARG_ITEM_ID to filePath
             )
         }
     }

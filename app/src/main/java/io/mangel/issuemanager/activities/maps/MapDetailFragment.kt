@@ -1,6 +1,9 @@
 package io.mangel.issuemanager.activities.maps
 
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +14,7 @@ import io.mangel.issuemanager.factories.ApplicationFactory
 import io.mangel.issuemanager.models.Map
 import kotlinx.android.synthetic.main.activity_map_detail.*
 import kotlinx.android.synthetic.main.map_detail.view.*
+import java.io.File
 
 /**
  * A fragment representing a single Map detail screen.
@@ -45,7 +49,19 @@ class MapDetailFragment : Fragment() {
 //        item?.let {
 //            rootView.map_detail.text = it.details
 //        }
-        rootView.map_detail.text = mapId
+        val f = File(context?.filesDir, mapId)
+        val parc = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
+        val pdfRenderer = PdfRenderer(parc)
+        val page = pdfRenderer.openPage(0)
+
+        val height = page.height
+        val width = page.width
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+        rootView.image.setImageBitmap(bitmap)
+
+        // rootView.map_detail.text = mapId
 
         return rootView
     }
