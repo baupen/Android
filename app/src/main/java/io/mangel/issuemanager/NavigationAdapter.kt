@@ -9,7 +9,7 @@ import io.mangel.issuemanager.models.Map
 import kotlinx.android.synthetic.main.map_list_content.view.*
 
 class NavigationAdapter(
-    private val parentActivity: Navigation,
+    private val backClickConsumer: NavigationTreeViewModel,
     private val currentMaps: List<Map>,
     private val mapIssueCounts: List<Int>,
     private val mapInvestigationCounts: List<Int>,
@@ -21,7 +21,7 @@ class NavigationAdapter(
     init {
         onClickListener = View.OnClickListener { v ->
             val map = v.tag as Map
-            parentActivity.mapHasBeenClicked(map.id)
+            backClickConsumer.mapHasBeenClicked(map.id)
         }
     }
 
