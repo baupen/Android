@@ -1,15 +1,18 @@
-package io.mangel.issuemanager
+package io.mangel.issuemanager.activities.Navigation
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import io.mangel.issuemanager.R
 import io.mangel.issuemanager.models.Map
-import kotlinx.android.synthetic.main.map_list_content.view.*
+import kotlinx.android.synthetic.main.row_navigation_map.view.*
 
 class NavigationAdapter(
     private val backClickConsumer: NavigationTreeViewModel,
+    private val context: Context,
     private val currentMaps: List<Map>,
     private val mapIssueCounts: List<Int>,
     private val mapInvestigationCounts: List<Int>,
@@ -27,17 +30,14 @@ class NavigationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.map_list_content, parent, false)
+            .inflate(R.layout.row_navigation_map, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (position == 0){
-            println("asdf")
-        }
         val map = currentMaps[position]
         holder.mapName.text = map.name // TODO: null safety
-        holder.issuesCount.text = "${mapIssueCounts[position]} offene Pendenzen"
+        holder.issuesCount.text = context.getString(R.string.open_issues).format(mapIssueCounts[position])
         holder.investigationCount.text = mapInvestigationCounts[position].toString()
         if (mapInvestigationCounts[position] == 0) holder.investigationCount.visibility = View.GONE
         else holder.investigationCount.visibility = View.VISIBLE

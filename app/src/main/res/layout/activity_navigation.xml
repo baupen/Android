@@ -1,31 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<androidx.drawerlayout.widget.DrawerLayout-->
-        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--xmlns:tools="http://schemas.android.com/tools"-->
-        <!--android:id="@+id/drawer_layout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:fitsSystemWindows="true"-->
-        <!--tools:openDrawer="start">-->
-
-    <!--<include-->
-            <!--layout="@layout/app_bar_navigation"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
-
-    <!--<com.google.android.material.navigation.NavigationView-->
-            <!--android:id="@+id/nav_view"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:fitsSystemWindows="true"-->
-            <!--app:menu="@menu/activity_navigation_drawer"/>-->
-
-    <!--&lt;!&ndash;app:headerLayout="@layout/nav_header_navigation"&ndash;&gt;-->
-
-<!--</androidx.drawerlayout.widget.DrawerLayout>-->
-
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -40,7 +13,7 @@
             android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
-                android:id="@+id/nav_toolbar"
+                android:id="@+id/navigation_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
@@ -48,7 +21,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.drawerlayout.widget.DrawerLayout
-            android:id="@+id/drawer_layout"
+            android:id="@+id/navigation_drawer_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:openDrawer="start">
@@ -57,12 +30,19 @@
                  android:layout_height="match_parent"/>
 
         <com.google.android.material.navigation.NavigationView
-                android:id="@+id/nav_view"
+                android:id="@+id/navigation_navigation_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="start">
 
-            <include layout="@layout/map_list"/>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/navigation_maps_rec_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:listitem="@layout/row_navigation_map"/>
         </com.google.android.material.navigation.NavigationView>
 
     </androidx.drawerlayout.widget.DrawerLayout>

@@ -13,27 +13,8 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
-                android:name=".Navigation"
-                android:label="@string/title_activity_navigation"
+                android:name=".activities.Navigation.Navigation"
                 android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-                android:name=".activities.maps.MapListActivity"
-                android:label="@string/title_map_list"
-                android:parentActivityName=".activities.overview.OverviewActivity"
-                android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value="io.mangel.issuemanager.activities.overview.OverviewActivity"/>
-        </activity>
-        <activity
-                android:name=".activities.maps.MapDetailActivity"
-                android:label="@string/title_map_detail"
-                android:parentActivityName=".activities.maps.MapListActivity"
-                android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value="io.mangel.issuemanager.activities.maps.MapListActivity"/>
         </activity>
         <activity android:name=".activities.overview.OverviewActivity">
         </activity>

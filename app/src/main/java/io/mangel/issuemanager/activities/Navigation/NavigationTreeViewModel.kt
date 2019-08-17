@@ -1,4 +1,4 @@
-package io.mangel.issuemanager
+package io.mangel.issuemanager.activities.Navigation
 
 import android.app.Activity
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +35,12 @@ class NavigationTreeViewModel(
         updateRecyclerData()
         if (firstTime) {
             mapList.adapter = NavigationAdapter(
-                this, currentMaps, issueCounts, investigationCounts, currentRootId != null
+                this,
+                parent,
+                currentMaps,
+                issueCounts,
+                investigationCounts,
+                currentRootId != null
             )
         } else {
             mapList.adapter?.notifyDataSetChanged()
