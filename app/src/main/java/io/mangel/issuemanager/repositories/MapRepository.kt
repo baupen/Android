@@ -21,7 +21,7 @@ class MapRepository(
     private val _parentChildMapping = HashMap<String?, ArrayList<Map>>()
     private var initialized = false
 
-    fun getMap(id: String): Map? {
+    fun getMap(id: String?): Map? {
         synchronized(this){
             if (!initialized)loadMaps()
             return _maps.find { m -> m.id == id }

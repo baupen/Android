@@ -23,7 +23,7 @@ class IssueRepository(
 
     // TODO: snoop for updates
 
-    fun getOpenIssuesCount(mapId: String, recursive: Boolean = false) : Int {
+    fun getOpenIssuesCount(mapId: String?, recursive: Boolean = false) : Int {
         synchronized(this){
             if (!initialized) loadRepository()
             if (recursive) return mapToOpenIssuesRec[mapId] ?: 0
@@ -31,7 +31,7 @@ class IssueRepository(
         }
     }
 
-    fun getToInvestigateIssuesCount(mapId: String, recursive: Boolean = false) : Int {
+    fun getToInvestigateIssuesCount(mapId: String?, recursive: Boolean = false) : Int {
         synchronized(this){
             if (!initialized) loadRepository()
             if (recursive) return mapToToInvestigateIssuesRec[mapId] ?: 0
@@ -76,7 +76,8 @@ class IssueRepository(
         rootMapIds.forEach { id -> treeAddUp(id, destination, baseMapping, mapRepo) }
     }
 
-    private fun treeAddUp(mapId: String, destination: HashMap<String, Int>, mapIdToOwnIssueCount: HashMap<String, Int>, mapRepo: MapRepository) : Int {
+    private fun treeAddUp(mapId: String, destination: HashMap<String, Int>, mapIdToOwnIssueCount: HashMap<String, Int>,
+                          mapRepo: MapRepository) : Int {
         val ownIssues = mapIdToOwnIssueCount[mapId] ?: 0
         val fromChildren =  mapRepo.getChildren(mapId)!!
             .map { child -> treeAddUp(child.id, destination, mapIdToOwnIssueCount, mapRepo) }.sum()
