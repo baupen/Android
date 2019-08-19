@@ -57,13 +57,13 @@ class NavigationTreeViewModel(
         currentMaps.addAll(mapRepo.getChildren(currentRootId)!!.sortedBy { map -> map.name })
         // for the new maps do the counting of total open issues
         issueCounts.clear()
-        issueCounts.addAll(currentMaps.map {
-                map ->  issueRepo.getOpenIssuesCount(map.id, map.id != currentRootId)
+        issueCounts.addAll(currentMaps.map { map ->
+            issueRepo.getOpenIssuesCount(map.id, map.id != currentRootId)
         })
         // for the new maps do the counting of total issues to investigate
         investigationCounts.clear()
-        investigationCounts.addAll(currentMaps.map {
-                map -> issueRepo.getToInvestigateIssuesCount(map.id, map.id != currentRootId)
+        investigationCounts.addAll(currentMaps.map { map ->
+            issueRepo.getToInvestigateIssuesCount(map.id, map.id != currentRootId)
         })
     }
 

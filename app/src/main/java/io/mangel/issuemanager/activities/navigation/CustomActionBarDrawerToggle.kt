@@ -3,21 +3,25 @@ package io.mangel.issuemanager.activities.navigation
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.widget.Toolbar
+import kotlin.math.max
+import kotlin.math.min
 
 
 interface HandlesBackClick {
     // if return is true the drawer will be collapsed. Else it will stay there
-    fun backWasClicked(): Boolean { return true }
+    fun backWasClicked(): Boolean {
+        return true
+    }
 }
 
 
-class CustomActionBarDrawerToggle(private val parent: HandlesBackClick, private val toolbar: Toolbar,
-                                  private val drawerLayout: DrawerLayout)
-    : DrawerLayout.DrawerListener
-{
+class CustomActionBarDrawerToggle(
+    private val parent: HandlesBackClick, private val toolbar: Toolbar,
+    private val drawerLayout: DrawerLayout
+) : DrawerLayout.DrawerListener {
 
     private val mHomeAsUpIndicator: Drawable?
     private val mSlider: DrawerArrowDrawable
@@ -35,7 +39,7 @@ class CustomActionBarDrawerToggle(private val parent: HandlesBackClick, private 
     }
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-        setPosition(Math.min(1f, Math.max(0f, slideOffset)))
+        setPosition(min(1f, max(0f, slideOffset)))
     }
 
     override fun onDrawerClosed(drawerView: View) {

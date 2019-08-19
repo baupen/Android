@@ -9,7 +9,7 @@ import io.mangel.issuemanager.activities.AbstractActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 
 
-class Navigation : AbstractActivity() {
+class NavigationActivity : AbstractActivity() {
 
     private lateinit var navigationTreeViewModel: NavigationTreeViewModel
 
@@ -46,35 +46,6 @@ class Navigation : AbstractActivity() {
             super.onBackPressed()
         }
     }
-
-//    fun mapHasBeenClicked(id: String?, firstTime: Boolean = false) {
-//        if (getApplicationFactory().mapRepository.getChildren(id)!!.isEmpty()){
-//            val iv: ImageView = findViewById(R.id.imageView2)
-//            val asdf = getApplicationFactory().mapRepository.getMap(id)
-//            val qwer = asdf!!.filePath
-//            val f = File(this.filesDir, qwer!!)
-//            val parc = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
-//            val pdfRenderer = PdfRenderer(parc)
-//            val page = pdfRenderer.openPage(0)
-//
-//            val height = page.height
-//            val width = page.width
-//
-//            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-//            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-//            iv.setImageBitmap(bitmap)
-//        }
-//        currentRootId = id
-//        updateRecyclerData()
-//        if (firstTime) {
-//            map_list.adapter = NavigationAdapter(
-//                this, currentMaps, issueCounts, investigationCounts, currentRootId != null
-//            )
-//        } else {
-//            map_list.adapter?.notifyDataSetChanged()
-//        }
-//        title = getCurrentTitle()
-//    }
 
     companion object {
         const val ROOT_ID = "root"

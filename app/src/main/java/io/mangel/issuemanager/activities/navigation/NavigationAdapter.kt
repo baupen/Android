@@ -38,9 +38,9 @@ class NavigationAdapter(
         holder.mapName.text = map.name
         holder.issuesCount.text = context.getString(R.string.open_issues).format(mapIssueCounts[position])
 
-        with (holder.investigationCount) {
+        with(holder.investigationCount) {
             if (mapInvestigationCounts[position] != 0) {
-                this.text =  mapInvestigationCounts[position].toString()
+                this.text = mapInvestigationCounts[position].toString()
             } else {
                 this.visibility = View.GONE
             }
