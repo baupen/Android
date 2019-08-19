@@ -41,6 +41,7 @@ class NavigationAdapter(
         with(holder.investigationCount) {
             if (mapInvestigationCounts[position] != 0) {
                 this.text = mapInvestigationCounts[position].toString()
+                this.visibility = View.VISIBLE
             } else {
                 this.visibility = View.GONE
             }
