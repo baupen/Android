@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import io.mangel.issuemanager.services.data.store.MetaProvider
 import io.mangel.issuemanager.services.data.store.SqliteEntry
 import org.junit.Test
-import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.full.primaryConstructor
@@ -66,7 +65,8 @@ class MetaProviderTest {
         assertContentEqual(columnsNames, propertyNames)
 
         // check unserialize
-        val parsedElement = meta.getRowParser().parseRow(parameters)
+        val sqliteParameters = mockSqliteStorageTransform(parameters)
+        val parsedElement = meta.getRowParser().parseRow(sqliteParameters)
         assertContentEqual(parsedElement, element)
 
         // check serialize
@@ -74,12 +74,30 @@ class MetaProviderTest {
         assertContentEqual(elementArray, parameters)
 
         // check unserialize with nullable
-        val parsedElementWithNull = meta.getRowParser().parseRow(parametersWithNull)
+        val sqliteparametersWithNull = mockSqliteStorageTransform(parametersWithNull)
+        val parsedElementWithNull = meta.getRowParser().parseRow(sqliteparametersWithNull)
         assertContentEqual(parsedElementWithNull, elementWithNull)
 
         // check serialize with nullable
         val elementArrayWithNull = meta.toArray(elementWithNull)
         assertContentEqual(elementArrayWithNull, parametersWithNull)
+    }
+
+    private fun mockSqliteStorageTransform(list: Array<Any?>): Array<Any?> {
+        return list.map { value ->
+            if (value is Boolean) {
+                if (value) {
+                    "1"
+                } else {
+                    "0"
+                }
+            } else if (value == null) {
+                null
+            }
+            else {
+                value.toString()
+            }
+        }.toTypedArray()
     }
 
     private fun getValueForType(
