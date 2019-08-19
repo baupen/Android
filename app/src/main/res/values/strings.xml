@@ -36,6 +36,5 @@
     <string name="logout">ausloggen</string>
     <string name="sync_finished">Aktualisierung abgeschlossen.</string>
     <string name="sync_failed">Aktualisierung fehlgeschlagen. Überprüfe die Internetverbindung.</string>
-    <string name="title_map_list">Maps</string>
-    <string name="title_map_detail">Map Detail</string>
+    <string name="open_issues">%d offene Pendenzen</string>
 </resources>

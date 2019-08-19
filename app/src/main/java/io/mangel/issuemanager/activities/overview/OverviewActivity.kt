@@ -12,8 +12,8 @@ import org.greenrobot.eventbus.ThreadMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.iterator
+import io.mangel.issuemanager.activities.navigation.NavigationActivity
 import io.mangel.issuemanager.activities.login.LoginActivity
-import io.mangel.issuemanager.activities.maps.MapListActivity
 import io.mangel.issuemanager.repositories.SyncFinishedEvent
 import io.mangel.issuemanager.repositories.SyncStartedEvent
 import org.jetbrains.anko.*
@@ -78,9 +78,9 @@ class OverviewActivity : AbstractActivity(), OverviewViewModel.Overview {
     }
 
     override fun navigate(constructionSite: ConstructionSite) {
-        startActivity<MapListActivity>(
-            MapListActivity.ROOT_ID to null,
-            MapListActivity.TITLE to constructionSite.name
+        startActivity<NavigationActivity>(
+            NavigationActivity.ROOT_ID to null,
+            NavigationActivity.TITLE to constructionSite.name
         )
     }
 

@@ -21,15 +21,15 @@ class MapRepository(
     private val _parentChildMapping = HashMap<String?, ArrayList<Map>>()
     private var initialized = false
 
-    fun getMap(id: String): Map? {
-        synchronized(this){
-            if (!initialized)loadMaps()
+    fun getMap(id: String?): Map? {
+        synchronized(this) {
+            if (!initialized) loadMaps()
             return _maps.find { m -> m.id == id }
         }
     }
 
     fun getChildren(id: String?): List<Map>? {
-        synchronized(this){
+        synchronized(this) {
             if (!initialized) loadMaps()
             return if (_parentChildMapping.containsKey(id)) _parentChildMapping[id]!!.toList() else null
         }
@@ -38,7 +38,7 @@ class MapRepository(
     @Suppress("unused")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun on(event: SavedMapsEvent) {
-        synchronized(this){
+        synchronized(this) {
             loadMaps()
             EventBus.getDefault().post(LoadedMapsEvent())
         }
@@ -61,12 +61,12 @@ class MapRepository(
         }
         // the maps without any children aren't inserted into the map yet
         val idsOfMapsWithoutChildren = entityMaps.map { m -> m.id }.toSet().minus(_parentChildMapping.keys)
-        idsOfMapsWithoutChildren.forEach { id -> _parentChildMapping[id] = ArrayList<Map>()}
+        idsOfMapsWithoutChildren.forEach { id -> _parentChildMapping[id] = ArrayList<Map>() }
 
         initialized = true
     }
 
-    private fun placeDownMap(map: Map){
+    private fun placeDownMap(map: Map) {
         _maps.add(map)
         val key = map.parent?.id
         if (!_parentChildMapping.contains(key)) {
