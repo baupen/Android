@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.activities.Navigation
+package io.mangel.issuemanager.activities.navigation
 
 import android.app.Activity
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +25,10 @@ class NavigationTreeViewModel(
     }
 
     override fun backWasClicked(): Boolean {
-        if (currentRootId == null) return true
+        if (currentRootId == null) {
+            return true
+        }
+
         mapHasBeenClicked(mapRepo.getMap(currentRootId)!!.parent?.id)
         return false
     }
@@ -39,8 +42,7 @@ class NavigationTreeViewModel(
                 parent,
                 currentMaps,
                 issueCounts,
-                investigationCounts,
-                currentRootId != null
+                investigationCounts
             )
         } else {
             mapList.adapter?.notifyDataSetChanged()

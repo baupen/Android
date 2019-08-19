@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.activities.Navigation
+package io.mangel.issuemanager.activities.navigation
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -15,9 +15,8 @@ class NavigationAdapter(
     private val context: Context,
     private val currentMaps: List<Map>,
     private val mapIssueCounts: List<Int>,
-    private val mapInvestigationCounts: List<Int>,
-    private val firstSpecial: Boolean
-) : RecyclerView.Adapter<NavigationAdapter.ViewHolder>(){
+    private val mapInvestigationCounts: List<Int>
+) : RecyclerView.Adapter<NavigationAdapter.ViewHolder>() {
 
     private val onClickListener: View.OnClickListener
 
@@ -36,13 +35,18 @@ class NavigationAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val map = currentMaps[position]
-        holder.mapName.text = map.name // TODO: null safety
+        holder.mapName.text = map.name
         holder.issuesCount.text = context.getString(R.string.open_issues).format(mapIssueCounts[position])
-        holder.investigationCount.text = mapInvestigationCounts[position].toString()
-        if (mapInvestigationCounts[position] == 0) holder.investigationCount.visibility = View.GONE
-        else holder.investigationCount.visibility = View.VISIBLE
 
-        with(holder.itemView){
+        with (holder.investigationCount) {
+            if (mapInvestigationCounts[position] != 0) {
+                this.text =  mapInvestigationCounts[position].toString()
+            } else {
+                this.visibility = View.GONE
+            }
+        }
+
+        with(holder.itemView) {
             tag = map
             setOnClickListener(onClickListener)
         }

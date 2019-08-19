@@ -1,4 +1,4 @@
-package io.mangel.issuemanager.activities.Navigation
+package io.mangel.issuemanager.activities.navigation
 
 import android.graphics.drawable.Drawable
 import android.view.View

@@ -12,7 +12,7 @@ import org.greenrobot.eventbus.ThreadMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.view.iterator
-import io.mangel.issuemanager.activities.Navigation.Navigation
+import io.mangel.issuemanager.activities.navigation.Navigation
 import io.mangel.issuemanager.activities.login.LoginActivity
 import io.mangel.issuemanager.repositories.SyncFinishedEvent
 import io.mangel.issuemanager.repositories.SyncStartedEvent
